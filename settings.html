@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>settings</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="settings-container">
+        <header>
+            <h2>⚙️ settings</h2>
+        </header>
+        <div class="settings-form">
+            <div class="form-group">
+                <label for="apiKey">api key:</label>
+                <input type="text" id="apiKey" placeholder="enter openrouter api key">
+                <button class="info-button" onclick="showApiKeySteps()">how to get api key?</button>
+            </div>
+            <div class="form-group">
+                <label for="aiModel">select ai model:</label>
+                <select id="aiModel">
+                    <option value="qwen/qwq-32b:free">qwen qwq-32b</option>
+                    <option value="moonshotai/moonlight-16b-a3b-instruct:free">moonshotai moonlight-16b</option>
+                    <option value="deepseek/deepseek-r1-zero:free">deepseek r1 zero</option>
+                    <option value="nousresearch/deephermes-3-llama-3-8b-preview:free">deephermes 3 (llama 3 8b)</option>
+                    <option value="google/gemini-2.0-pro-exp-02-05:free">google gemini 2.0 pro</option>
+                    <option value="mistralai/mistral-small-24b-instruct-2501:free">mistral small 24b</option>
+                    <option value="sophosympatheia/rogue-rose-103b-v0.2:free">rogue rose 103b</option>
+                    <option value="meta-llama/llama-3.3-70b-instruct:free">meta llama 3.3 70b</option>
+                </select>
+            </div>
+            <button class="save-button" onclick="saveSettings()">save & back</button>
+        </div>
+    </div>
+
+    <div id="apiKeySteps" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="hideApiKeySteps()">&times;</span>
+            <h3>how to get an openrouter api key</h3>
+            <ol>
+                <li>go to the <a href="https://openrouter.ai" target="_blank">OpenRouter website</a>.</li>
+                <li>sign up or log in to your account.</li>
+                <li>navigate to the API section in your dashboard.</li>
+                <li>create a new API key or use an existing one.</li>
+                <li>copy the API key and paste it into the input field above.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const apiKeyInput = document.getElementById("apiKey");
+        const aiModelSelect = document.getElementById("aiModel");
+
+        apiKeyInput.value = localStorage.getItem("openrouter_api") || "";
+        aiModelSelect.value = localStorage.getItem("ai_model") || "qwen/qwq-32b:free";
+
+        function saveSettings() {
+            localStorage.setItem("openrouter_api", apiKeyInput.value);
+            localStorage.setItem("ai_model", aiModelSelect.value);
+            window.location.href = "index.html";
+        }
+
+        function showApiKeySteps() {
+            document.getElementById("apiKeySteps").style.display = "block";
+        }
+
+        function hideApiKeySteps() {
+            document.getElementById("apiKeySteps").style.display = "none";
+        }
+    </script>
+</body>
+</html>

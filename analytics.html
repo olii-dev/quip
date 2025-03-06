@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>analytics</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="settings-container">
+        <header>
+            <h2>📊 analytics</h2>
+        </header>
+        <div class="analytics-content">
+            <div class="stat-box">
+                <h3>total messages exchanged</h3>
+                <p id="totalMessages">loading...</p>
+            </div>
+        </div>
+        <button class="back-button" onclick="window.location.href='index.html'">back</button>
+    </div>
+
+    <script>
+        function calculateStatistics() {
+            const chats = JSON.parse(localStorage.getItem("chats")) || [];
+            const totalMessages = chats.length;
+            document.getElementById("totalMessages").textContent = totalMessages;
+        }
+
+        calculateStatistics();
+    </script>
+</body>
+</html>
