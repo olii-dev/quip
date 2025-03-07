@@ -16,15 +16,46 @@
                 <h3>total messages exchanged</h3>
                 <p id="totalMessages">loading...</p>
             </div>
+            <div class="stat-box">
+                <h3>messages sent by you</h3>
+                <p id="userMessages">loading...</p>
+            </div>
+            <div class="stat-box">
+                <h3>messages received from ai</h3>
+                <p id="aiMessages">loading...</p>
+            </div>
+            <div class="stat-box">
+                <h3>conversation sessions</h3>
+                <p id="conversationSessions">loading...</p>
+            </div>
+            <div class="stat-box">
+                <h3>average message length</h3>
+                <p id="avgMessageLength">loading...</p>
+            </div>
         </div>
         <button class="back-button" onclick="window.location.href='index.html'">back</button>
+        <p class="disclaimer">all analytics are processed locally. <b>no</b> data is sent to any server.</p>
     </div>
 
     <script>
         function calculateStatistics() {
             const chats = JSON.parse(localStorage.getItem("chats")) || [];
             const totalMessages = chats.length;
+            const userMessages = chats.filter(chat => chat.isUser).length;
+            const aiMessages = totalMessages - userMessages;
+            const conversationSessions = JSON.parse(localStorage.getItem("conversationHistory"))?.length || 0;
+
+            let totalMessageLength = 0;
+            chats.forEach(chat => {
+                totalMessageLength += chat.text.length;
+            });
+            const avgMessageLength = totalMessages > 0 ? (totalMessageLength / totalMessages).toFixed(2) : 0;
+
             document.getElementById("totalMessages").textContent = totalMessages;
+            document.getElementById("userMessages").textContent = userMessages;
+            document.getElementById("aiMessages").textContent = aiMessages;
+            document.getElementById("conversationSessions").textContent = conversationSessions;
+            document.getElementById("avgMessageLength").textContent = avgMessageLength;
         }
 
         calculateStatistics();

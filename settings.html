@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>settings</title>
+    <title>quip - settings</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -30,6 +30,7 @@
                     <option value="meta-llama/llama-3.3-70b-instruct:free">meta llama 3.3 70b</option>
                 </select>
             </div>
+            <button class="clear-history" onclick="confirmClearChat()">🗑️ clear chat history</button>
             <button class="save-button" onclick="saveSettings()">save & back</button>
         </div>
     </div>
@@ -41,9 +42,9 @@
             <ol>
                 <li>go to the <a href="https://openrouter.ai" target="_blank">OpenRouter website</a>.</li>
                 <li>sign up or log in to your account.</li>
-                <li>navigate to the API section in your dashboard.</li>
-                <li>create a new API key or use an existing one.</li>
-                <li>copy the API key and paste it into the input field above.</li>
+                <li>click your profile in the <b>top right</b>, then 'keys' from the drop down menu.</li>
+                <li>now click 'create key' (or use an existing one).</li>
+                <li>copy and <b>save</b> the API key and paste it into the input field above.</li>
             </ol>
         </div>
     </div>
@@ -59,6 +60,18 @@
             localStorage.setItem("openrouter_api", apiKeyInput.value);
             localStorage.setItem("ai_model", aiModelSelect.value);
             window.location.href = "index.html";
+        }
+
+        function confirmClearChat() {
+            if (confirm("are you sure you want to clear the chat history?")) {
+                clearChatHistory();
+            }
+        }
+
+        function clearChatHistory() {
+            localStorage.removeItem("chats");
+            localStorage.removeItem("conversationHistory");
+            alert("Chat history cleared!");
         }
 
         function showApiKeySteps() {

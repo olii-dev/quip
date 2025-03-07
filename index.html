@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>quip ai</title>
+    <title>quip</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container" id="app-container">
         <header>
-            <h2>quip ai</h2>
+            <h2>quip</h2>
             <div class="header-buttons">
                 <button class="settings-button" onclick="window.location.href='settings.html'">⚙️</button>
                 <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-                <button class="clear-history" onclick="clearChatHistory()">🗑️</button>
                 <button class="analytics-button" onclick="window.location.href='analytics.html'">📊</button>
             </div>
         </header>
@@ -52,13 +51,6 @@
             localStorage.setItem("chats", JSON.stringify(chats));
         }
 
-        function clearChatHistory() {
-            localStorage.removeItem("chats");
-            localStorage.removeItem("conversationHistory");
-            chatbox.innerHTML = "";
-            conversationHistory = [];
-        }
-
         async function sendMessage() {
             const message = userInput.value.trim();
             if (!message) return;
@@ -81,7 +73,7 @@
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${apiKey}`,
-                        "X-Title": "quip ai"
+                        "X-Title": "quip"
                     },
                     body: JSON.stringify({
                         model: aiModel,

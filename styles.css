@@ -67,6 +67,9 @@ header button {
     overflow-y: auto;
     background-color: #f1f1f1;
     transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .dark-theme #chatbox {
@@ -76,11 +79,12 @@ header button {
 
 .message {
     padding: 12px;
-    margin: 8px 0;
     border-radius: 8px;
     max-width: 70%;
     word-wrap: break-word;
-    font-size: 1.1em;
+    font-size: 1em;
+    line-height: 1.4em;
+    position: relative;
 }
 
 .user {
@@ -224,7 +228,7 @@ footer button:hover {
     background-color: #218838;
 }
 
-.save-button {
+.save-button, .clear-history {
     background-color: #007bff;
     color: white;
     border: none;
@@ -233,9 +237,10 @@ footer button:hover {
     cursor: pointer;
     width: 100%;
     font-size: 1.2em;
+    margin-bottom: 10px;
 }
 
-.save-button:hover {
+.save-button:hover, .clear-history:hover {
     background-color: #0056b3;
 }
 
@@ -331,4 +336,11 @@ footer button:hover {
 
 .back-button:hover {
     background-color: #0056b3;
+}
+
+.disclaimer {
+    font-size: 0.9em;
+    color: #6c757d;
+    text-align: center;
+    margin-top: 20px;
 }
