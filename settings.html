@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>quip - settings</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="settings-container">
         <header>
-            <h2>⚙️ settings</h2>
+            <h2><i class="fas fa-cog"></i> settings</h2>
         </header>
         <div class="settings-form">
             <div class="form-group">
@@ -20,17 +21,32 @@
             <div class="form-group">
                 <label for="aiModel">select ai model:</label>
                 <select id="aiModel">
-                    <option value="qwen/qwq-32b:free">qwen qwq-32b</option>
-                    <option value="moonshotai/moonlight-16b-a3b-instruct:free">moonshotai moonlight-16b</option>
-                    <option value="deepseek/deepseek-r1-zero:free">deepseek r1 zero</option>
-                    <option value="nousresearch/deephermes-3-llama-3-8b-preview:free">deephermes 3 (llama 3 8b)</option>
-                    <option value="google/gemini-2.0-pro-exp-02-05:free">google gemini 2.0 pro</option>
-                    <option value="mistralai/mistral-small-24b-instruct-2501:free">mistral small 24b</option>
-                    <option value="sophosympatheia/rogue-rose-103b-v0.2:free">rogue rose 103b</option>
-                    <option value="meta-llama/llama-3.3-70b-instruct:free">meta llama 3.3 70b</option>
+                    <optgroup label="General">
+                        <option value="qwen/qwq-32b:free">qwen qwq-32b</option>
+                        <option value="moonshotai/moonlight-16b-a3b-instruct:free">moonshotai moonlight-16b</option>
+                        <option value="nousresearch/deephermes-3-llama-3-8b-preview:free">deephermes 3 (llama 3 8b)</option>
+                        <option value="mistralai/mistral-small-24b-instruct-2501:free">mistral small 24b</option>
+                        <option value="sophosympatheia/rogue-rose-103b-v0.2:free">rogue rose 103b</option>
+                        <option value="meta-llama/llama-3.3-70b-instruct:free">meta llama 3.3 70b</option>
+                        <option value="nvidia/llama-3.1-nemotron-70b-instruct:free">nvidia: llama 3.1 nemotron 70b instruct</option>
+                    </optgroup>
+                    <optgroup label="Coding">
+                        <option value="qwen/qwen-2.5-coder-32b-instruct:free">qwen qwen-2.5-coder-32b</option>
+                    </optgroup>
+                    <optgroup label="Google Models">
+                        <option value="google/gemini-2.0-pro-exp-02-05:free">google gemini 2.0 pro</option>
+                        <option value="google/gemma-3-27b-it:free">google gemma-3-27b</option>
+                        <option value="google/gemini-2.0-flash-lite-preview-02-05:free">google gemini-2.0-flash-lite</option>
+                        <option value="google/learnlm-1.5-pro-experimental:free">google learnlm 1.5 pro experimental</option>
+                    </optgroup>
+                    <optgroup label="Deepseek Models">
+                        <option value="deepseek/deepseek-r1:free">deepseek r1</option>
+                        <option value="deepseek/deepseek-r1-zero:free">deepseek r1 zero</option>
+                        <option value="deepseek/deepseek-chat:free">deepseek v3</option>
+                    </optgroup>
                 </select>
             </div>
-            <button class="clear-history" onclick="confirmClearChat()">🗑️ clear chat history</button>
+            <button class="clear-history" onclick="confirmClearChat()"><i class="fas fa-trash"></i> clear chat history</button>
             <button class="save-button" onclick="saveSettings()">save & back</button>
         </div>
     </div>
@@ -81,6 +97,17 @@
         function hideApiKeySteps() {
             document.getElementById("apiKeySteps").style.display = "none";
         }
+
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.body.classList.add("dark-theme");
+            } else {
+                document.body.classList.remove("dark-theme");
+            }
+        }
+
+        applySavedTheme();
     </script>
 </body>
 </html>

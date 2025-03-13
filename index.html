@@ -5,49 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>quip</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container" id="app-container">
         <header>
             <h2>quip</h2>
             <div class="header-buttons">
-                <button class="settings-button" onclick="window.location.href='settings.html'">⚙️</button>
-                <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-                <button class="analytics-button" onclick="window.location.href='analytics.html'">📊</button>
+                <button class="settings-button" onclick="window.location.href='settings.html'"><i class="fas fa-cog"></i></button>
+                <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+                <button class="analytics-button" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-bar"></i></button>
+                <button class="search-toggle" onclick="toggleSearchBar()"><i class="fas fa-search"></i></button>
             </div>
         </header>
+        <div class="search-bar" id="searchBar">
+            <input type="text" id="searchInput" placeholder="Search messages..." oninput="searchMessages()">
+        </div>
         <div id="chatbox"></div>
-        <div id="typing-indicator" class="typing-indicator">typing...</div>
+        <div id="typing-indicator" class="typing-indicator">
+            <span class="dot" id="dot1">.</span>
+            <span class="dot" id="dot2">.</span>
+            <span class="dot" id="dot3">.</span>
+        </div>
         <footer>
-            <input type="text" id="userInput" placeholder="type your message...">
-            <button onclick="sendMessage()">send</button>
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="type your message..." onkeydown="handleEnterKey(event)">
+                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
         </footer>
+        <button class="scroll-bottom-button" onclick="scrollToBottom()"><i class="fas fa-arrow-down"></i></button>
     </div>
 
     <script>
         const chatbox = document.getElementById("chatbox");
         const userInput = document.getElementById("userInput");
         const typingIndicator = document.getElementById("typing-indicator");
+        const searchInput = document.getElementById("searchInput");
+        const searchBar = document.getElementById("searchBar");
         let apiKey = localStorage.getItem("openrouter_api");
         let aiModel = localStorage.getItem("ai_model") || "qwen/qwq-32b:free";
         let conversationHistory = JSON.parse(localStorage.getItem("conversationHistory")) || [];
 
-        function addMessage(text, isUser) {
+        function addMessage(text, isUser, timestamp) {
             const msg = document.createElement("div");
             msg.className = `message ${isUser ? "user" : "bot"}`;
-            msg.innerHTML = text;
+            msg.innerHTML = `<span class="message-text">${text}</span><span class="timestamp">${timestamp}</span>`;
             chatbox.appendChild(msg);
             chatbox.scrollTop = chatbox.scrollHeight;
         }
 
         function loadChats() {
             const chats = JSON.parse(localStorage.getItem("chats")) || [];
-            chats.forEach(chat => addMessage(chat.text, chat.isUser));
+            chats.forEach(chat => addMessage(chat.text, chat.isUser, chat.timestamp));
         }
 
         function saveChat(text, isUser) {
             const chats = JSON.parse(localStorage.getItem("chats")) || [];
-            chats.push({ text, isUser });
+            const timestamp = new Date().toLocaleTimeString();
+            chats.push({ text, isUser, timestamp });
             localStorage.setItem("chats", JSON.stringify(chats));
         }
 
@@ -60,7 +75,7 @@
                 return;
             }
 
-            addMessage(message, true);
+            addMessage(message, true, new Date().toLocaleTimeString());
             saveChat(message, true);
             userInput.value = "";
             typingIndicator.style.display = "block";
@@ -83,25 +98,90 @@
 
                 const data = await response.json();
                 const botReply = data.choices[0]?.message?.content || "error: no response";
-                addMessage(botReply, false);
+                const timestamp = new Date().toLocaleTimeString();
+                addMessage(botReply, false, timestamp);
                 saveChat(botReply, false);
 
                 conversationHistory.push({ role: "assistant", content: botReply });
                 localStorage.setItem("conversationHistory", JSON.stringify(conversationHistory));
             } catch (error) {
-                addMessage("error contacting ai", false);
+                addMessage("error contacting ai", false, new Date().toLocaleTimeString());
             } finally {
                 typingIndicator.style.display = "none";
+            }
+        }
+
+        function handleEnterKey(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendMessage();
             }
         }
 
         function toggleTheme() {
             document.body.classList.toggle("dark-theme");
             const themeButton = document.querySelector(".theme-toggle");
-            themeButton.textContent = document.body.classList.contains("dark-theme") ? "☀️" : "🌙";
+            const icon = themeButton.querySelector("i");
+            icon.classList.toggle("fa-moon");
+            icon.classList.toggle("fa-sun");
+            localStorage.setItem("theme", document.body.classList.contains("dark-theme") ? "dark" : "light");
+        }
+
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.body.classList.add("dark-theme");
+                document.querySelector(".theme-toggle i").classList.add("fa-sun");
+                document.querySelector(".theme-toggle i").classList.remove("fa-moon");
+            } else {
+                document.body.classList.remove("dark-theme");
+                document.querySelector(".theme-toggle i").classList.add("fa-moon");
+                document.querySelector(".theme-toggle i").classList.remove("fa-sun");
+            }
+        }
+
+        function toggleSearchBar() {
+            searchBar.style.display = searchBar.style.display === "none" ? "block" : "none";
+        }
+
+        function searchMessages() {
+            const query = searchInput.value.trim().toLowerCase();
+            const messages = document.querySelectorAll(".message");
+            messages.forEach(msg => {
+                const text = msg.querySelector(".message-text").textContent.toLowerCase();
+                if (query) {
+                    if (text.includes(query)) {
+                        msg.style.display = "block";
+                        msg.querySelector(".message-text").innerHTML = text.replace(new RegExp(query, 'gi'), match => `<mark>${match}</mark>`);
+                    } else {
+                        msg.style.display = "none";
+                    }
+                } else {
+                    msg.style.display = "block";
+                    msg.querySelector(".message-text").innerHTML = text;
+                }
+            });
+        }
+
+        function scrollToBottom() {
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        function animateTypingIndicator() {
+            const dots = document.querySelectorAll(".dot");
+            let index = 0;
+            setInterval(() => {
+                dots[index].style.opacity = "1";
+                setTimeout(() => {
+                    dots[index].style.opacity = "0";
+                }, 300);
+                index = (index + 1) % dots.length;
+            }, 600);
         }
 
         loadChats();
+        applySavedTheme();
+        animateTypingIndicator();
     </script>
 </body>
 </html>

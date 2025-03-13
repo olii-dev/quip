@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>analytics</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="settings-container">
         <header>
-            <h2>📊 analytics</h2>
+            <h2><i class="fas fa-chart-bar"></i> analytics</h2>
         </header>
         <div class="analytics-content">
             <div class="stat-box">
@@ -58,7 +59,17 @@
             document.getElementById("avgMessageLength").textContent = avgMessageLength;
         }
 
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.body.classList.add("dark-theme");
+            } else {
+                document.body.classList.remove("dark-theme");
+            }
+        }
+
         calculateStatistics();
+        applySavedTheme();
     </script>
 </body>
 </html>
