@@ -3,39 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>analytics</title>
+    <title>quip - analytics</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="images/quip-icon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="settings-container">
-        <header>
-            <h2><i class="fas fa-chart-bar"></i> analytics</h2>
-        </header>
-        <div class="analytics-content">
-            <div class="stat-box">
-                <h3>total messages exchanged</h3>
-                <p id="totalMessages">loading...</p>
+            <h2 class="header-2"><i class="fas fa-chart-bar"></i> analytics</h2>
+            <div class="analytics-content">
+                <div class="stat-box">
+                    <h3>total messages exchanged</h3>
+                    <p id="totalMessages">loading...</p>
+                </div>
+                <div class="stat-box">
+                    <h3>messages sent by you</h3>
+                    <p id="userMessages">loading...</p>
+                </div>
+                <div class="stat-box">
+                    <h3>messages received from ai</h3>
+                    <p id="aiMessages">loading...</p>
+                </div>
+                <div class="stat-box">
+                    <h3>conversation sessions</h3>
+                    <p id="conversationSessions">loading...</p>
+                </div>
+                <div class="stat-box">
+                    <h3>average message length</h3>
+                    <p id="avgMessageLength">loading...</p>
+                </div>
             </div>
-            <div class="stat-box">
-                <h3>messages sent by you</h3>
-                <p id="userMessages">loading...</p>
-            </div>
-            <div class="stat-box">
-                <h3>messages received from ai</h3>
-                <p id="aiMessages">loading...</p>
-            </div>
-            <div class="stat-box">
-                <h3>conversation sessions</h3>
-                <p id="conversationSessions">loading...</p>
-            </div>
-            <div class="stat-box">
-                <h3>average message length</h3>
-                <p id="avgMessageLength">loading...</p>
-            </div>
-        </div>
-        <button class="back-button" onclick="window.location.href='index.html'">back</button>
-        <p class="disclaimer">all analytics are processed locally. <b>no</b> data is sent to any server.</p>
+            <button class="back-button" onclick="window.location.href='index.html'">back</button>
+            <p class="disclaimer">all analytics are processed locally. <b>no</b> data is sent to any server.</p>
+            <p class="warning-message" style="color: red;">every time you clear the chat, the analytics also get reset!</p>
     </div>
 
     <script>

@@ -6,6 +6,10 @@
     <title>quip</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
+    <link rel="icon" href="images/quip-icon.png" type="image/x-icon">
 </head>
 <body>
     <div class="container" id="app-container">
@@ -13,31 +17,33 @@
             <h2>quip</h2>
             <div class="header-buttons">
                 <button class="settings-button" onclick="window.location.href='settings.html'"><i class="fas fa-cog"></i></button>
-                <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
                 <button class="analytics-button" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-bar"></i></button>
                 <button class="search-toggle" onclick="toggleSearchBar()"><i class="fas fa-search"></i></button>
+                <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
             </div>
         </header>
         <div class="search-bar" id="searchBar">
-            <input type="text" id="searchInput" placeholder="Search messages..." oninput="searchMessages()">
+            <input type="text" id="searchInput" placeholder="search messages..." oninput="searchMessages()">
         </div>
         <div id="chatbox"></div>
         <div id="typing-indicator" class="typing-indicator">
-            <span class="dot" id="dot1">.</span>
-            <span class="dot" id="dot2">.</span>
-            <span class="dot" id="dot3">.</span>
+            <span id="typing" style="font-size: 16px; color: white;">typing</span>
+            <span class="dot" id="dot1"></span>
+            <span class="dot" id="dot2"></span>
+            <span class="dot" id="dot3"></span>
         </div>
         <footer>
             <div class="input-container">
                 <input type="text" id="userInput" placeholder="type your message..." onkeydown="handleEnterKey(event)">
-                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                <button onclick="sendMessage()" style="margin-right: 10px;"><i class="fas fa-paper-plane"></i></button>
+                <button class="scroll-bottom-button" onclick="scrollToBottom()"><i class="fas fa-arrow-down"></i></button>
             </div>
         </footer>
-        <button class="scroll-bottom-button" onclick="scrollToBottom()"><i class="fas fa-arrow-down"></i></button>
     </div>
 
     <script>
         const chatbox = document.getElementById("chatbox");
+        const scrollButton = document.querySelector(".scroll-bottom-button");
         const userInput = document.getElementById("userInput");
         const typingIndicator = document.getElementById("typing-indicator");
         const searchInput = document.getElementById("searchInput");
@@ -47,12 +53,13 @@
         let conversationHistory = JSON.parse(localStorage.getItem("conversationHistory")) || [];
 
         function addMessage(text, isUser, timestamp) {
-            const msg = document.createElement("div");
-            msg.className = `message ${isUser ? "user" : "bot"}`;
-            msg.innerHTML = `<span class="message-text">${text}</span><span class="timestamp">${timestamp}</span>`;
-            chatbox.appendChild(msg);
-            chatbox.scrollTop = chatbox.scrollHeight;
-        }
+    const msg = document.createElement("div");
+    msg.className = `message ${isUser ? "user" : "bot"}`;
+    const parsedText = marked.parse(text);
+    msg.innerHTML = `<span class="message-text">${parsedText}</span><span class="timestamp">${timestamp}</span>`;
+    chatbox.appendChild(msg);
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
 
         function loadChats() {
             const chats = JSON.parse(localStorage.getItem("chats")) || [];
@@ -112,11 +119,11 @@
         }
 
         function handleEnterKey(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                sendMessage();
-            }
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
         }
+    }
 
         function toggleTheme() {
             document.body.classList.toggle("dark-theme");
@@ -166,6 +173,15 @@
         function scrollToBottom() {
             chatbox.scrollTop = chatbox.scrollHeight;
         }
+
+        function toggleScrollButton() {
+    const isAtBottom = chatbox.scrollHeight - chatbox.scrollTop === chatbox.clientHeight;
+    scrollButton.style.display = isAtBottom ? "none" : "block";
+}
+
+chatbox.addEventListener("scroll", toggleScrollButton);
+
+toggleScrollButton();
 
         function animateTypingIndicator() {
             const dots = document.querySelectorAll(".dot");

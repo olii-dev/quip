@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Cal+Sans:wght@100;700&display=swap');
+
 body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Cal Sans', 'Helvetica Neue', Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -68,6 +70,21 @@ header button {
     cursor: pointer;
 }
 
+.header-2 {
+    justify-content: space-between;
+    align-items: center;
+    color: #343a40;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    transition: color 0.3s ease;
+}
+
+.dark-theme .header-2 {
+    color: #e9ecef;
+}
+
 #chatbox {
     flex: 1;
     padding: 15px;
@@ -85,26 +102,56 @@ header button {
 }
 
 .message {
-    padding: 12px;
-    border-radius: 15px;
-    max-width: 70%;
+    padding: 15px;
+    border-radius: 20px;
+    max-width: 75%;
     word-wrap: break-word;
     font-size: 1em;
-    line-height: 1.4em;
+    line-height: 1.6em;
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.message .message-text {
-    margin-bottom: 5px;
+.message-text h1, .message-text h2, .message-text h3 {
+    margin: 0;
+    font-weight: bold;
+}
+
+.message-text p {
+    margin: 0;
+}
+
+.message-text code {
+    background-color: grey;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.message-text pre {
+    background-color: grey;
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.message-text a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.message-text a:hover {
+    text-decoration: underline;
 }
 
 .message .timestamp {
-    font-size: 0.8em;
-    color: #c4c4c4;
+    font-size: 0.85em;
+    color: #adb5bd;
     align-self: flex-end;
 }
 
@@ -115,8 +162,8 @@ header button {
 }
 
 .bot {
-    background: #e9ecef;
-    color: black;
+    background: #f1f3f5;
+    color: #212529;
     align-self: flex-start;
 }
 
@@ -173,14 +220,22 @@ header button {
 .typing-indicator {
     padding: 10px;
     text-align: center;
-    color: #c4c4c4;
+    color: white;
     display: none;
     font-size: 1em;
+    font-style: italic;
+    letter-spacing: 0.5px;
 }
 
 .typing-indicator .dot {
     opacity: 0;
     animation: blink 1.8s infinite;
+    background-color: #6c757d;
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    margin: 0 3px;
 }
 
 @keyframes blink {
@@ -201,9 +256,9 @@ header button {
 }
 
 .scroll-bottom-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+    position: absolute; /* Positioning inside the chatbox */
+    bottom: 15px; /* Adjusted to stay above the bottom padding */
+    right: 15px; /* Adjusted to stay within the right padding */
     background-color: #007bff;
     color: white;
     border: none;
@@ -351,7 +406,7 @@ mark {
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
+    overflow: hidden;
     background-color: rgb(0,0,0);
     background-color: rgba(0,0,0,0.4);
 }
@@ -392,17 +447,18 @@ mark {
 }
 
 .analytics-content {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    display: grid; /* Use a grid layout */
+    grid-template-columns: 1fr 1fr; /* Two columns for better use of space */
+    gap: 10px; /* Reduce the gap between stat boxes */
+    width: 100%; /* Ensure it fits within the container */
 }
 
 .stat-box {
-    background-color: #e9ecef;
-    padding: 20px;
-    border-radius: 8px;
+    padding: 10px; /* Reduce padding */
+    font-size: 0.9em; /* Reduce font size */
+    border-radius: 6px; /* Slightly smaller border radius */
     text-align: center;
+    background-color: #e9ecef;
     transition: background-color 0.3s ease;
 }
 
@@ -412,13 +468,13 @@ mark {
 }
 
 .stat-box h3 {
-    margin-bottom: 10px;
-    font-size: 1.2em;
+    margin-bottom: 5px; /* Reduce spacing */
+    font-size: 1em; /* Adjust font size */
 }
 
 .stat-box p {
     margin: 0;
-    font-size: 1.1em;
+    font-size: 0.9em; /* Adjust font size */
 }
 
 .back-button {
@@ -434,12 +490,108 @@ mark {
 }
 
 .back-button:hover {
-    background-color: #0056b3;
+    background-color: #0070e8;
+    transition: ease-in-out 0.3s;
 }
 
 .disclaimer {
-    font-size: 0.9em;
-    color: #6c757d;
+    font-size: 0.8em; /* Reduce font size */
+    margin-top: 10px; /* Reduce spacing */
     text-align: center;
-    margin-top: 20px;
 }
+
+@media (max-width: 480px) {
+    .container {
+        width: 100%; /* Use full width on very small screens */
+        height: 100vh; /* Use full height */
+        border-radius: 0; /* Remove border radius for a cleaner look */
+    }
+
+    header h2 {
+        font-size: 1.2em; /* Adjust font size for smaller screens */
+    }
+
+    .message {
+        font-size: 0.9em; /* Adjust message font size */
+        padding: 10px; /* Reduce padding */
+    }
+
+    .input-container {
+        padding: 10px; /* Reduce padding */
+    }
+
+    .scroll-bottom-button {
+        width: 35px; /* Adjust button size */
+        height: 35px;
+        font-size: 1em;
+    }
+}
+
+a {
+    text-decoration: none;
+    color: #007bff;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background-color: #007bff;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+a:hover {
+    color: #67abf4;
+}
+
+a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.warning-message {
+    font-size: 0.95em;
+    margin-top: 10px;
+    background-color: #f8ce42;
+    padding: 15px;
+    border-radius: 12px;
+    border: 5px solid black; /* Made the border black and big */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+.toggle-visibility {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 16px;
+    color: black;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-container {
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Align items vertically */
+}
+
+.password-container input {
+    flex: 1; /* Allow the input to take up available space */
+}
+
+.password-container .toggle-visibility {
+    margin-left: 10px; /* Add some spacing between the input and the button */
+}
+

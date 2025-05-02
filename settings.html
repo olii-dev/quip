@@ -6,45 +6,86 @@
     <title>quip - settings</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="images/quip-icon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="settings-container">
-        <header>
-            <h2><i class="fas fa-cog"></i> settings</h2>
-        </header>
+            <h2 class="header-2"><i class="fas fa-cog"></i> settings</h2>
+            <br>
         <div class="settings-form">
             <div class="form-group">
                 <label for="apiKey">api key:</label>
-                <input type="text" id="apiKey" placeholder="enter openrouter api key">
+                <div class="password-container">
+                    <input type="password" id="apiKey" placeholder="enter openrouter api key">
+                    <button type="button" class="toggle-visibility" onclick="toggleApiKeyVisibility()">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
                 <button class="info-button" onclick="showApiKeySteps()">how to get api key?</button>
             </div>
+            <br>
             <div class="form-group">
                 <label for="aiModel">select ai model:</label>
-                <select id="aiModel">
-                    <optgroup label="General">
-                        <option value="qwen/qwq-32b:free">qwen qwq-32b</option>
-                        <option value="moonshotai/moonlight-16b-a3b-instruct:free">moonshotai moonlight-16b</option>
+                <select id="aiModel" onchange="checkModelWarning()">
+                    <optgroup label="general">
                         <option value="nousresearch/deephermes-3-llama-3-8b-preview:free">deephermes 3 (llama 3 8b)</option>
-                        <option value="mistralai/mistral-small-24b-instruct-2501:free">mistral small 24b</option>
-                        <option value="sophosympatheia/rogue-rose-103b-v0.2:free">rogue rose 103b</option>
-                        <option value="meta-llama/llama-3.3-70b-instruct:free">meta llama 3.3 70b</option>
-                        <option value="nvidia/llama-3.1-nemotron-70b-instruct:free">nvidia: llama 3.1 nemotron 70b instruct</option>
+                        <option value="moonshotai/moonlight-16b-a3b-instruct:free">moonshotai moonlight (16b)</option>
+                        <option value="nvidia/llama-3.1-nemotron-70b-instruct:free">nvidia: llama 3.1 nemotron (70b instruct)</option>
+                        <option value="nvidia/llama-3.1-nemotron-ultra-253b-v1:free">nvidia: llama 3.1 nemotron ultra v1 (253b)</option>
                     </optgroup>
-                    <optgroup label="Coding">
-                        <option value="qwen/qwen-2.5-coder-32b-instruct:free">qwen qwen-2.5-coder-32b</option>
+                    <optgroup label="Qwen models">
+                        <option value="qwen/qwq-32b:free">qwq (32b)</option>
+                        <option value="qwen/qwen-2.5-coder-32b-instruct:free">qwen2.5 coder (32b)</option>
+                        <option value="qwen/qwen2.5-vl-32b-instruct:free">qwen2.5 vl (32b instruct)</option>
+                        <option value="qwen/qwen2.5-vl-72b-instruct:free">qwen2.5 vl (72b instruct)</option>
                     </optgroup>
-                    <optgroup label="Google Models">
-                        <option value="google/gemini-2.0-pro-exp-02-05:free">google gemini 2.0 pro</option>
-                        <option value="google/gemma-3-27b-it:free">google gemma-3-27b</option>
-                        <option value="google/gemini-2.0-flash-lite-preview-02-05:free">google gemini-2.0-flash-lite</option>
+                    <optgroup label="Google models">
                         <option value="google/learnlm-1.5-pro-experimental:free">google learnlm 1.5 pro experimental</option>
+                        <option value="google/google/gemini-2.0-flash-lite-001:free">google gemini 2.0 flash lite</option>
+                        <option value="google/gemini-2.5-pro-exp-03-25">google gemini (2.5 pro experimental)</option>
+                        <option value="google/gemma-3-1b-it:free">google gemma 3 (1b)</option>
+                        <option value="google/gemma-3-27b-it:free">google gemma 3 (27b)</option>
                     </optgroup>
-                    <optgroup label="Deepseek Models">
-                        <option value="deepseek/deepseek-r1:free">deepseek r1</option>
-                        <option value="deepseek/deepseek-r1-zero:free">deepseek r1 zero</option>
+                    <optgroup label="Deepseek models">
+                        <option value="deepseek/deepseek-r1:free">deepseek r1 (37b)</option>
+                        <option value="deepseek/deepseek-r1-zero:free">deepseek r1 zero (37b)</option>
+                        <option value="deepseek/deepseek-prover-v2:free">deepseek prover v2 (thinks it's ChatGPT)</option>
                         <option value="deepseek/deepseek-chat:free">deepseek v3</option>
+                        <option value="deepseek/deepseek-chat-v3-0324:free">deepseek v3 (0324)</option>
+                        <option value="deepseek/deepseek-r1-distill-qwen-32b:free">deepseek r1 distill qwen (32b)</option>
                     </optgroup>
-                </select>
+                    <optgroup label="Mistral models">
+                        <option value="mistralai/mistral-nemo:free">mistral nemo (12b)</option>
+                        <option value="mistralai/mistral-small-24b-instruct-2501:free">mistral small (24b)</option>
+                        <option value="mistralai/mistral-7b-instruct:free">mistral instruct (7b)</option>
+                    </optgroup>
+                    <optgroup label="Meta models">
+                        <option value="meta-llama/llama-3.3-70b-instruct:free">llama 3.3 (70b instruct)</option>
+                        <option value="meta-llama/llama-3.2-3b-instruct:free">llama 3.2 (3b)</option>
+                        <option value="meta-llama/llama-3.3-70b-instruct:free">meta llama 3.3 (70b)</option>
+                </select>                
+                <div id="modelWarning" class="warning-message" style="display: none; color: red; margin-top: 10px;">
+                    the gemini 2.5 pro experimental model is curreently <i>strictly</i> limited to 1 request per minute and 1000 requests per day (including errors). frequent 429 errors are expected. 
+                </div>
+                <br>
+                <button class="info-button" onclick="showModelSelectionGuide()">how do i select the right model?</button>
+
+<div id="modelSelectionGuide" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="hideModelSelectionGuide()">&times;</span>
+        <h3>how to select the right model for you</h3>
+        <p>choosing the right model depends on your use case:</p>
+        <ul>
+            <li><b>general models:</b> these are a great option for most tasks, like answering questions or generating text.</li>
+            <li><b>small models (e.g., 8b-16b):</b> these are faster and more efficient but may lack the depth of larger models. great for lightweight tasks.</li>
+            <li><b>medium models (e.g., 32b):</b> these give a balance between performance and resource usage. good for most tasks.</li>
+            <li><b>large models (e.g., 70b+):</b> these are powerful but may be slower and consume more resources. use them for complex tasks that need deep understanding.</li>
+        </ul>
+        <p>if you're still not sure, start with a general model and see how that goes to find the best fit for your needs.</p>
+    </div>
+</div>
+<br><br>
             </div>
             <button class="clear-history" onclick="confirmClearChat()"><i class="fas fa-trash"></i> clear chat history</button>
             <button class="save-button" onclick="saveSettings()">save & back</button>
@@ -56,7 +97,7 @@
             <span class="close-button" onclick="hideApiKeySteps()">&times;</span>
             <h3>how to get an openrouter api key</h3>
             <ol>
-                <li>go to the <a href="https://openrouter.ai" target="_blank">OpenRouter website</a>.</li>
+                <li>go to the <a class="a" href="https://openrouter.ai" target="_blank">OpenRouter</a> website.</li>
                 <li>sign up or log in to your account.</li>
                 <li>click your profile in the <b>top right</b>, then 'keys' from the drop down menu.</li>
                 <li>now click 'create key' (or use an existing one).</li>
@@ -87,7 +128,7 @@
         function clearChatHistory() {
             localStorage.removeItem("chats");
             localStorage.removeItem("conversationHistory");
-            alert("Chat history cleared!");
+            alert("chat history cleared!");
         }
 
         function showApiKeySteps() {
@@ -108,6 +149,40 @@
         }
 
         applySavedTheme();
+
+        function checkModelWarning() {
+    const aiModelSelect = document.getElementById("aiModel");
+    const modelWarning = document.getElementById("modelWarning");
+
+    if (aiModelSelect.value === "google/gemini-2.5-pro-exp-03-25") {
+        modelWarning.style.display = "block"; // Show the warning
+    } else {
+        modelWarning.style.display = "none"; // Hide the warning
+    }
+}
+
+function toggleApiKeyVisibility() {
+        const apiKeyInput = document.getElementById("apiKey");
+        const toggleButtonIcon = document.querySelector(".toggle-visibility i");
+
+        if (apiKeyInput.type === "password") {
+            apiKeyInput.type = "text";
+            toggleButtonIcon.classList.remove("fa-eye");
+            toggleButtonIcon.classList.add("fa-eye-slash");
+        } else {
+            apiKeyInput.type = "password";
+            toggleButtonIcon.classList.remove("fa-eye-slash");
+            toggleButtonIcon.classList.add("fa-eye");
+        }
+    }
+
+    function showModelSelectionGuide() {
+    document.getElementById("modelSelectionGuide").style.display = "block";
+}
+
+function hideModelSelectionGuide() {
+    document.getElementById("modelSelectionGuide").style.display = "none";
+}
     </script>
 </body>
 </html>
