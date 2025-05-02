@@ -72,51 +72,60 @@
             chats.push({ text, isUser, timestamp });
             localStorage.setItem("chats", JSON.stringify(chats));
         }
-
+        
         async function sendMessage() {
-            const message = userInput.value.trim();
-            if (!message) return;
+    const message = userInput.value.trim();
+    if (!message) {
+        alert("please enter a message before sending.");
+        return;
+    }
 
-            if (!apiKey) {
-                alert("please go to settings and enter an api key!");
-                return;
-            }
+    if (!apiKey) {
+        alert("api key is missing. please go to settings and enter an api key!");
+        return;
+    }
 
-            addMessage(message, true, new Date().toLocaleTimeString());
-            saveChat(message, true);
-            userInput.value = "";
-            typingIndicator.style.display = "block";
+    addMessage(message, true, new Date().toLocaleTimeString());
+    saveChat(message, true);
+    userInput.value = "";
+    typingIndicator.style.display = "block";
 
-            conversationHistory.push({ role: "user", content: message });
+    conversationHistory.push({ role: "user", content: message });
 
-            try {
-                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${apiKey}`,
-                        "X-Title": "quip"
-                    },
-                    body: JSON.stringify({
-                        model: aiModel,
-                        messages: conversationHistory
-                    })
-                });
+    try {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${apiKey}`,
+                "X-Title": "quip"
+            },
+            body: JSON.stringify({
+                model: aiModel,
+                messages: conversationHistory
+            })
+        });
 
-                const data = await response.json();
-                const botReply = data.choices[0]?.message?.content || "error: no response";
-                const timestamp = new Date().toLocaleTimeString();
-                addMessage(botReply, false, timestamp);
-                saveChat(botReply, false);
-
-                conversationHistory.push({ role: "assistant", content: botReply });
-                localStorage.setItem("conversationHistory", JSON.stringify(conversationHistory));
-            } catch (error) {
-                addMessage("error contacting ai", false, new Date().toLocaleTimeString());
-            } finally {
-                typingIndicator.style.display = "none";
-            }
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`server error: ${response.status} - ${response.statusText}\n${errorText}`);
         }
+
+        const data = await response.json();
+        const botReply = data.choices[0]?.message?.content || "error: no response from ai.";
+        const timestamp = new Date().toLocaleTimeString();
+        addMessage(botReply, false, timestamp);
+        saveChat(botReply, false);
+
+        conversationHistory.push({ role: "assistant", content: botReply });
+        localStorage.setItem("conversationHistory", JSON.stringify(conversationHistory));
+    } catch (error) {
+        console.error("error during api call:", error); 
+        addMessage("an error occurred while contacting the ai. please try again later.", false, new Date().toLocaleTimeString());
+    } finally {
+        typingIndicator.style.display = "none";
+    }
+}
 
         function handleEnterKey(event) {
         if (event.key === "Enter" && !event.shiftKey) {
