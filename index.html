@@ -108,7 +108,17 @@
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`server error: ${response.status} - ${response.statusText}\n${errorText}`);
+            if (response.status === 401) {
+                throw new Error("authentication failed. please check your api key.");
+            } else if (response.status === 429) {
+                throw new Error("rate limit exceeded. please wait before sending more requests.");
+            } else if (response.status >= 500) {
+                throw new Error(`server error: ${response.status} - ${response.statusText}\nDetails: ${errorText}`);
+            } else if (response.status === 404) {
+                throw new Error("endpoint not found. please check the api url.");
+            } else {
+                throw new Error(`unexpected error: ${response.status} - ${response.statusText}\nDetails: ${errorText}`);
+            }
         }
 
         const data = await response.json();
@@ -120,8 +130,22 @@
         conversationHistory.push({ role: "assistant", content: botReply });
         localStorage.setItem("conversationHistory", JSON.stringify(conversationHistory));
     } catch (error) {
-        console.error("error during api call:", error); 
-        addMessage("an error occurred while contacting the ai. please try again later.", false, new Date().toLocaleTimeString());
+        console.error("error during api call:", error);
+
+        // Display user-friendly error messages
+        if (error.message.includes("authentication failed")) {
+            addMessage("authentication failed. please check your api key in the settings.", false, new Date().toLocaleTimeString());
+        } else if (error.message.includes("rate limit exceeded")) {
+            addMessage("rate limit exceeded. please wait a while before trying again.", false, new Date().toLocaleTimeString());
+        } else if (error.message.includes("server error")) {
+            addMessage("the server encountered an issue. please try again later.", false, new Date().toLocaleTimeString());
+        } else if (error.message.includes("endpoint not found")) {
+            addMessage("the api endpoint could not be found.", false, new Date().toLocaleTimeString());
+        } else if (error.message.includes("unexpected error")) {
+            addMessage("an unexpected error occurred. please try again later.", false, new Date().toLocaleTimeString());
+        } else {
+            addMessage("an unknown error occurred. please contact support if the issue persists.", false, new Date().toLocaleTimeString());
+        }
     } finally {
         typingIndicator.style.display = "none";
     }

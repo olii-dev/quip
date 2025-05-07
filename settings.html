@@ -28,6 +28,13 @@
             <div class="form-group">
                 <label for="aiModel">select ai model:</label>
                 <select id="aiModel" onchange="checkModelWarning()">
+                    <optgroup label="newly released models">
+                        <option value="microsoft/phi-4-reasoning-plus:free">phi 4 reasoning plus (14b)</option>
+                        <option value="qwen/qwen3-0.6b-04-28:free">qwen3 (0.6b)</option>
+                        <option value="qwen/qwen3-1.7b:free">qwen3 (1.7b)</option>
+                        <option value="qwen/qwen3-4b:free">qwen3 (4b)</option>
+                        <option value="opengvlab/internvl3-14b:free">internvl3 (14b)</option>
+                    </optgroup>
                     <optgroup label="general">
                         <option value="nousresearch/deephermes-3-llama-3-8b-preview:free">deephermes 3 (llama 3 8b)</option>
                         <option value="moonshotai/moonlight-16b-a3b-instruct:free">moonshotai moonlight (16b)</option>
@@ -50,7 +57,7 @@
                     <optgroup label="Deepseek models">
                         <option value="deepseek/deepseek-r1:free">deepseek r1 (37b)</option>
                         <option value="deepseek/deepseek-r1-zero:free">deepseek r1 zero (37b)</option>
-                        <option value="deepseek/deepseek-prover-v2:free">deepseek prover v2 (thinks it's ChatGPT)</option>
+                        <option value="removed due to issues">deepseek prover v2</option>
                         <option value="deepseek/deepseek-chat:free">deepseek v3</option>
                         <option value="deepseek/deepseek-chat-v3-0324:free">deepseek v3 (0324)</option>
                         <option value="deepseek/deepseek-r1-distill-qwen-32b:free">deepseek r1 distill qwen (32b)</option>
@@ -77,6 +84,7 @@
         <h3>how to select the right model for you</h3>
         <p>choosing the right model depends on your use case:</p>
         <ul>
+            <li><b>newly released models:</b> these are newly released models to the public.</li>
             <li><b>general models:</b> these are a great option for most tasks, like answering questions or generating text.</li>
             <li><b>small models (e.g., 8b-16b):</b> these are faster and more efficient but may lack the depth of larger models. great for lightweight tasks.</li>
             <li><b>medium models (e.g., 32b):</b> these give a balance between performance and resource usage. good for most tasks.</li>
@@ -155,9 +163,13 @@
     const modelWarning = document.getElementById("modelWarning");
 
     if (aiModelSelect.value === "google/gemini-2.5-pro-exp-03-25") {
-        modelWarning.style.display = "block"; // Show the warning
+        modelWarning.style.display = "block";
+        modelWarning.innerHTML = "the gemini 2.5 pro experimental model is currently <i>strictly</i> limited to 1 request per minute and 1000 requests per day (including errors). frequent 429 errors are expected.";
+    } else if (aiModelSelect.value === "removed due to issues") {
+        modelWarning.style.display = "block";
+        modelWarning.innerHTML = "the deepseek prover v2 model has been removed due to issues, it only writes in plain text and it thinks it is chatgpt.<br>this is not a bug on our end, it is an issue with the model that we cannot fix.";
     } else {
-        modelWarning.style.display = "none"; // Hide the warning
+        modelWarning.style.display = "none";
     }
 }
 

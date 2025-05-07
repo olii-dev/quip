@@ -304,10 +304,20 @@ header button {
     color: #e9ecef;
 }
 
+/* Style for highlighted search results */
 mark {
-    background-color: yellow;
-    border-radius: 3px;
-    padding: 0 2px;
+    background-color: #ffeb3b; /* Light yellow background */
+    color: #000; /* Black text for better contrast */
+    padding: 2px 4px; /* Add some padding for better visibility */
+    border-radius: 4px; /* Rounded corners for a modern look */
+    font-weight: bold; /* Make the highlighted text stand out */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
+}
+
+/* Dark theme adjustments for highlights */
+.dark-theme mark {
+    background-color: #ffc107; /* Amber background for dark mode */
+    color: #212529; /* Dark text for better contrast in dark mode */
 }
 
 .settings-container {
