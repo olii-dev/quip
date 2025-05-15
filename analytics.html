@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>quip - analytics</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">\
     <link rel="icon" href="images/quip-icon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap" rel="stylesheet">
 </head>
@@ -26,37 +26,60 @@
                     <p id="aiMessages">loading...</p>
                 </div>
                 <div class="stat-box">
-                    <h3>conversation sessions</h3>
-                    <p id="conversationSessions">loading...</p>
+                    <h3>total conversation turns</h3>
+                    <p id="conversationTurns">loading...</p>
                 </div>
                 <div class="stat-box">
+                    <h3>total chats created</h3>
+                    <p id="totalChats">loading...</p>
+                </div>
+                 <div class="stat-box">
                     <h3>average message length</h3>
                     <p id="avgMessageLength">loading...</p>
                 </div>
             </div>
             <button class="back-button" onclick="window.location.href='index.html'">back</button>
-            <p class="disclaimer">all analytics are processed locally. <b>no</b> data is sent to any server.</p>
+            <p class="disclaimer">analytics are processed locally. <b>no</b> analytical data is sent to any server.</p>
             <p class="warning-message" style="color: red;">every time you clear the chat, the analytics also get reset!</p>
     </div>
 
     <script>
         function calculateStatistics() {
-            const chats = JSON.parse(localStorage.getItem("chats")) || [];
-            const totalMessages = chats.length;
-            const userMessages = chats.filter(chat => chat.isUser).length;
-            const aiMessages = totalMessages - userMessages;
-            const conversationSessions = JSON.parse(localStorage.getItem("conversationHistory"))?.length || 0;
-
+            const allChats = JSON.parse(localStorage.getItem("allChats")) || {};
+            let totalMessages = 0;
+            let userMessages = 0;
+            let aiMessages = 0;
+            let totalConversationTurns = 0;
             let totalMessageLength = 0;
-            chats.forEach(chat => {
-                totalMessageLength += chat.text.length;
-            });
+            const totalChats = Object.keys(allChats).length;
+
+
+            for (const chatId in allChats) {
+                const chat = allChats[chatId];
+                if (chat.messages) {
+                    totalMessages += chat.messages.length;
+                    chat.messages.forEach(msg => {
+                        if (msg.isUser) {
+                            userMessages++;
+                        } else {
+                            aiMessages++;
+                        }
+                        totalMessageLength += msg.text.length;
+                    });
+                }
+                 if (chat.conversationHistory) {
+                     // Conversation turns is the number of messages, as each message is one turn
+                    totalConversationTurns += chat.conversationHistory.length;
+                 }
+            }
+
             const avgMessageLength = totalMessages > 0 ? (totalMessageLength / totalMessages).toFixed(2) : 0;
 
             document.getElementById("totalMessages").textContent = totalMessages;
             document.getElementById("userMessages").textContent = userMessages;
             document.getElementById("aiMessages").textContent = aiMessages;
-            document.getElementById("conversationSessions").textContent = conversationSessions;
+            document.getElementById("conversationTurns").textContent = totalConversationTurns;
+            document.getElementById("totalChats").textContent = totalChats;
             document.getElementById("avgMessageLength").textContent = avgMessageLength;
         }
 

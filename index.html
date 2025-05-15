@@ -16,12 +16,15 @@
         <header>
             <h2>quip</h2>
             <div class="header-buttons">
+                <button class="new-chat-button" onclick="createChat()"><i class="fas fa-plus-circle"></i> new chat</button>
+                <select id="chatSelect" onchange="selectChat(this.value)"></select>
                 <button class="settings-button" onclick="window.location.href='settings.html'"><i class="fas fa-cog"></i></button>
                 <button class="analytics-button" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-bar"></i></button>
                 <button class="search-toggle" onclick="toggleSearchBar()"><i class="fas fa-search"></i></button>
                 <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
             </div>
         </header>
+        <div id="currentChatTitle" class="current-chat-title" onclick="renameChat(currentChatId)"></div>
         <div class="search-bar" id="searchBar">
             <input type="text" id="searchInput" placeholder="search messages..." oninput="searchMessages()">
         </div>
@@ -48,115 +51,277 @@
         const typingIndicator = document.getElementById("typing-indicator");
         const searchInput = document.getElementById("searchInput");
         const searchBar = document.getElementById("searchBar");
+        const chatSelect = document.getElementById("chatSelect");
+
         let apiKey = localStorage.getItem("openrouter_api");
         let aiModel = localStorage.getItem("ai_model") || "qwen/qwq-32b:free";
-        let conversationHistory = JSON.parse(localStorage.getItem("conversationHistory")) || [];
+        let allChats = JSON.parse(localStorage.getItem("allChats")) || {};
+        let currentChatId = localStorage.getItem("currentChatId") || null;
 
-        function addMessage(text, isUser, timestamp) {
-    const msg = document.createElement("div");
-    msg.className = `message ${isUser ? "user" : "bot"}`;
-    const parsedText = marked.parse(text);
-    msg.innerHTML = `<span class="message-text">${parsedText}</span><span class="timestamp">${timestamp}</span>`;
-    chatbox.appendChild(msg);
-    chatbox.scrollTop = chatbox.scrollHeight;
+        // Ensure there's at least one chat
+        if (Object.keys(allChats).length === 0) {
+            createChat(); // Create the first chat
+        } else if (!currentChatId || !allChats[currentChatId]) {
+             currentChatId = Object.keys(allChats)[0]; // Select the first chat if current is invalid
+             saveCurrentChatId();
+        }
+
+        function saveAllChats() {
+            localStorage.setItem("allChats", JSON.stringify(allChats));
+        }
+
+        function saveCurrentChatId() {
+            localStorage.setItem("currentChatId", currentChatId);
+        }
+
+        function addMessageToChat(chatId, text, isUser, timestamp) {
+            if (!allChats[chatId]) return;
+            allChats[chatId].messages.push({ text, isUser, timestamp });
+            // Only save conversation history for the AI model interaction
+            if (!allChats[chatId].conversationHistory) {
+                 allChats[chatId].conversationHistory = [];
+            }
+            allChats[chatId].conversationHistory.push({ role: isUser ? "user" : "assistant", content: text });
+
+            saveAllChats();
+        }
+
+        function renderMessage(text, isUser, timestamp) {
+            const msg = document.createElement("div");
+            msg.className = `message ${isUser ? "user" : "bot"}`;
+            // Sanitize and parse markdown
+            const cleanHTML = DOMPurify.sanitize(marked.parse(text));
+            msg.innerHTML = `<span class="message-text">${cleanHTML}</span><span class="timestamp">${timestamp}</span>`;
+            chatbox.appendChild(msg);
+        }
+
+
+function loadChats() {
+    // Populate chat select dropdown
+    chatSelect.innerHTML = ""; // Clear existing options
+    
+    for (const chatId in allChats) {
+        const option = document.createElement("option");
+        option.value = chatId;
+        option.textContent = allChats[chatId].title; // Use the custom title
+        if (chatId === currentChatId) {
+            option.selected = true;
+        }
+        chatSelect.appendChild(option);
+    }
+    
+    // Add management options at the end of the dropdown
+    const separator = document.createElement("option");
+    separator.disabled = true;
+    separator.textContent = "─────────────";
+    chatSelect.appendChild(separator);
+    
+    const renameOption = document.createElement("option");
+    renameOption.value = "rename";
+    renameOption.textContent = "⚙️ rename current chat";
+    chatSelect.appendChild(renameOption);
+    
+    // Only add delete option if there's more than one chat
+    if (Object.keys(allChats).length > 1) {
+        const deleteOption = document.createElement("option");
+        deleteOption.value = "delete";
+        deleteOption.textContent = "🗑️ delete current chat";
+        chatSelect.appendChild(deleteOption);
+    }
+    
+    // Load messages for the current chat
+    chatbox.innerHTML = ""; // Clear current messages
+    if (allChats[currentChatId] && allChats[currentChatId].messages) {
+        allChats[currentChatId].messages.forEach(msg => renderMessage(msg.text, msg.isUser, msg.timestamp));
+        scrollToBottom(); // Scroll to the latest message
+    }
+
+    if (document.getElementById("currentChatTitle")) {
+        document.getElementById("currentChatTitle").textContent = allChats[currentChatId]?.title || "";
+    }
 }
 
-        function loadChats() {
-            const chats = JSON.parse(localStorage.getItem("chats")) || [];
-            chats.forEach(chat => addMessage(chat.text, chat.isUser, chat.timestamp));
-        }
+function createChat() {
+    const defaultTitle = `chat ${Object.keys(allChats).length + 1}`;
+    const MAX_TITLE_LENGTH = 40; // Set maximum title length
+    let customTitle = prompt("enter a name for your new chat (max 40 char):", defaultTitle);
+    
+    // User canceled the prompt
+    if (customTitle === null) return;
+    
+    // Trim if exceeds maximum length
+    if (customTitle && customTitle.length > MAX_TITLE_LENGTH) {
+        customTitle = customTitle.substring(0, MAX_TITLE_LENGTH) + "...";
+    }
+    
+    // Use the custom title if provided, otherwise use the default
+    const chatTitle = customTitle || defaultTitle;
+    
+    const newChatId = Date.now().toString(); // Simple unique ID
+    allChats[newChatId] = {
+        title: chatTitle,
+        messages: [],
+        conversationHistory: []
+    };
+    
+    currentChatId = newChatId;
+    saveAllChats();
+    saveCurrentChatId();
+    loadChats(); // Load the new chat
+}
 
-        function saveChat(text, isUser) {
-            const chats = JSON.parse(localStorage.getItem("chats")) || [];
-            const timestamp = new Date().toLocaleTimeString();
-            chats.push({ text, isUser, timestamp });
-            localStorage.setItem("chats", JSON.stringify(chats));
-        }
+function deleteChat(chatId) {
+    if (!allChats[chatId] || Object.keys(allChats).length <= 1) return; // Don't delete the last chat
+    
+    if (confirm("Are you sure you want to delete this chat?")) {
+        delete allChats[chatId];
+        saveAllChats();
         
+        // Select another chat
+        currentChatId = Object.keys(allChats)[0];
+        saveCurrentChatId();
+        
+        loadChats(); // Refresh the chat list and load the new current chat
+    }
+}
+
+function renameChat(chatId) {
+    if (!allChats[chatId]) return;
+    
+    const currentTitle = allChats[chatId].title;
+    const MAX_TITLE_LENGTH = 40; // Set maximum title length
+    let newTitle = prompt("enter a new name for this chat:", currentTitle);
+    
+    // Trim if exceeds maximum length
+    if (newTitle && newTitle.length > MAX_TITLE_LENGTH) {
+        newTitle = newTitle.substring(0, MAX_TITLE_LENGTH) + "...";
+    }
+    
+    // Only update if the user provided a new name
+    if (newTitle && newTitle !== currentTitle) {
+        allChats[chatId].title = newTitle;
+        saveAllChats();
+        loadChats(); // Refresh the chat list
+    }
+}
+
+function selectChat(chatId) {
+    if (chatId === "rename") {
+        // If the "Rename" option is selected, initiate the renaming process
+        renameChat(currentChatId);
+        
+        // Reset the dropdown to select the current chat
+        chatSelect.value = currentChatId;
+        return;
+    }
+    
+    if (chatId === "delete") {
+        // If the "Delete" option is selected, initiate the deletion process
+        deleteChat(currentChatId);
+        
+        // No need to reset dropdown as we'll be switching to another chat
+        return;
+    }
+    
+    currentChatId = chatId;
+    saveCurrentChatId();
+    loadChats(); // Load the selected chat
+}
+
         async function sendMessage() {
-    const message = userInput.value.trim();
-    if (!message) {
-        alert("please enter a message before sending.");
-        return;
-    }
+            const message = userInput.value.trim();
+            if (!message) {
+                alert("please enter a message before sending.");
+                return;
+            }
 
-    if (!apiKey) {
-        alert("api key is missing. please go to settings and enter an api key!");
-        return;
-    }
+            if (!apiKey) {
+                alert("api key is missing. please go to settings and enter an api key!");
+                return;
+            }
 
-    addMessage(message, true, new Date().toLocaleTimeString());
-    saveChat(message, true);
-    userInput.value = "";
-    typingIndicator.style.display = "block";
+            const currentChat = allChats[currentChatId];
+            if (!currentChat) {
+                 alert("Error: No chat selected.");
+                 return;
+            }
 
-    conversationHistory.push({ role: "user", content: message });
+            const timestamp = new Date().toLocaleTimeString();
+            // Add user message to the current chat's history and render it
+            addMessageToChat(currentChatId, message, true, timestamp);
+            renderMessage(message, true, timestamp); // Render user message immediately
+            userInput.value = "";
+            typingIndicator.style.display = "block";
+            scrollToBottom();
 
-    try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`,
-                "X-Title": "quip"
-            },
-            body: JSON.stringify({
-                model: aiModel,
-                messages: conversationHistory
-            })
-        });
+            try {
+                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${apiKey}`,
+                        "X-Title": "quip"
+                    },
+                    body: JSON.stringify({
+                        model: aiModel,
+                        messages: currentChat.conversationHistory // Use current chat's history
+                    })
+                });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            if (response.status === 401) {
-                throw new Error("authentication failed. please check your api key.");
-            } else if (response.status === 429) {
-                throw new Error("rate limit exceeded. please wait before sending more requests.");
-            } else if (response.status >= 500) {
-                throw new Error(`server error: ${response.status} - ${response.statusText}\nDetails: ${errorText}`);
-            } else if (response.status === 404) {
-                throw new Error("endpoint not found. please check the api url.");
-            } else {
-                throw new Error(`unexpected error: ${response.status} - ${response.statusText}\nDetails: ${errorText}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    if (response.status === 401) {
+                        throw new Error("authentication failed. please check your api key.");
+                    } else if (response.status === 429) {
+                        throw new Error("rate limit exceeded. please wait before sending more requests.");
+                    } else if (response.status >= 500) {
+                        throw new Error(`server error: ${response.status} - ${response.statusText}\\nDetails: ${errorText}`);
+                    } else if (response.status === 404) {
+                        throw new Error("endpoint not found. please check the api url.");
+                    } else {
+                        throw new Error(`unexpected error: ${response.status} - ${response.statusText}\\nDetails: ${errorText}`);
+                    }
+                }
+
+                const data = await response.json();
+                const botReply = data.choices[0]?.message?.content || "error: no response from ai.";
+                const botTimestamp = new Date().toLocaleTimeString();
+                // Add bot message to the current chat's history and render it
+                addMessageToChat(currentChatId, botReply, false, botTimestamp);
+                renderMessage(botReply, false, botTimestamp);
+                scrollToBottom();
+
+            } catch (error) {
+                console.error("error during api call:", error);
+                const errorTimestamp = new Date().toLocaleTimeString();
+                // Display user-friendly error messages in the chat
+                let errorMessage = "an unknown error occurred. please contact support if the issue persists.";
+                if (error.message.includes("authentication failed")) {
+                    errorMessage = "authentication failed. please check your api key in the settings.";
+                } else if (error.message.includes("rate limit exceeded")) {
+                    errorMessage = "rate limit exceeded. please wait a while before trying again.";
+                } else if (error.message.includes("server error")) {
+                    errorMessage = "the server encountered an issue. please try again later.";
+                } else if (error.message.includes("endpoint not found")) {
+                    errorMessage = "the api endpoint could not be found.";
+                } else if (error.message.includes("unexpected error")) {
+                    errorMessage = "an unexpected error occurred. please try again later.";
+                }
+                addMessageToChat(currentChatId, errorMessage, false, errorTimestamp);
+                renderMessage(errorMessage, false, errorTimestamp);
+                scrollToBottom();
+
+            } finally {
+                typingIndicator.style.display = "none";
             }
         }
 
-        const data = await response.json();
-        const botReply = data.choices[0]?.message?.content || "error: no response from ai.";
-        const timestamp = new Date().toLocaleTimeString();
-        addMessage(botReply, false, timestamp);
-        saveChat(botReply, false);
-
-        conversationHistory.push({ role: "assistant", content: botReply });
-        localStorage.setItem("conversationHistory", JSON.stringify(conversationHistory));
-    } catch (error) {
-        console.error("error during api call:", error);
-
-        // Display user-friendly error messages
-        if (error.message.includes("authentication failed")) {
-            addMessage("authentication failed. please check your api key in the settings.", false, new Date().toLocaleTimeString());
-        } else if (error.message.includes("rate limit exceeded")) {
-            addMessage("rate limit exceeded. please wait a while before trying again.", false, new Date().toLocaleTimeString());
-        } else if (error.message.includes("server error")) {
-            addMessage("the server encountered an issue. please try again later.", false, new Date().toLocaleTimeString());
-        } else if (error.message.includes("endpoint not found")) {
-            addMessage("the api endpoint could not be found.", false, new Date().toLocaleTimeString());
-        } else if (error.message.includes("unexpected error")) {
-            addMessage("an unexpected error occurred. please try again later.", false, new Date().toLocaleTimeString());
-        } else {
-            addMessage("an unknown error occurred. please contact support if the issue persists.", false, new Date().toLocaleTimeString());
-        }
-    } finally {
-        typingIndicator.style.display = "none";
-    }
-}
-
         function handleEnterKey(event) {
-        if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            sendMessage();
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
         }
-    }
 
         function toggleTheme() {
             document.body.classList.toggle("dark-theme");
@@ -188,38 +353,48 @@
             const query = searchInput.value.trim().toLowerCase();
             const messages = document.querySelectorAll(".message");
             messages.forEach(msg => {
-                const text = msg.querySelector(".message-text").textContent.toLowerCase();
+                const textElement = msg.querySelector(".message-text");
+                const originalText = msg.dataset.originalText || textElement.textContent; // Store original text
+                msg.dataset.originalText = originalText; // Save original text
+
                 if (query) {
-                    if (text.includes(query)) {
+                    if (originalText.toLowerCase().includes(query)) {
                         msg.style.display = "block";
-                        msg.querySelector(".message-text").innerHTML = text.replace(new RegExp(query, 'gi'), match => `<mark>${match}</mark>`);
+                        // Use DOMPurify to sanitize before highlighting
+                        const highlightedHTML = DOMPurify.sanitize(originalText.replace(new RegExp(query, 'gi'), match => `<mark>${match}</mark>`));
+                        textElement.innerHTML = highlightedHTML;
                     } else {
                         msg.style.display = "none";
                     }
                 } else {
                     msg.style.display = "block";
-                    msg.querySelector(".message-text").innerHTML = text;
+                    // Restore original text when query is empty
+                    textElement.innerHTML = DOMPurify.sanitize(marked.parse(originalText));
                 }
             });
         }
+
 
         function scrollToBottom() {
             chatbox.scrollTop = chatbox.scrollHeight;
         }
 
         function toggleScrollButton() {
-    const isAtBottom = chatbox.scrollHeight - chatbox.scrollTop === chatbox.clientHeight;
-    scrollButton.style.display = isAtBottom ? "none" : "block";
-}
+            // Check if the user is near the bottom (e.g., within 50px)
+            const isNearBottom = chatbox.scrollHeight - chatbox.scrollTop - chatbox.clientHeight < 50;
+            scrollButton.style.display = isNearBottom ? "none" : "block";
+        }
 
-chatbox.addEventListener("scroll", toggleScrollButton);
-
-toggleScrollButton();
+        chatbox.addEventListener("scroll", toggleScrollButton);
 
         function animateTypingIndicator() {
             const dots = document.querySelectorAll(".dot");
             let index = 0;
-            setInterval(() => {
+            // Clear any existing interval before starting a new one
+            if (chatbox.typingInterval) {
+                clearInterval(chatbox.typingInterval);
+            }
+            chatbox.typingInterval = setInterval(() => {
                 dots[index].style.opacity = "1";
                 setTimeout(() => {
                     dots[index].style.opacity = "0";
@@ -228,9 +403,12 @@ toggleScrollButton();
             }, 600);
         }
 
+        // Initial load
         loadChats();
         applySavedTheme();
         animateTypingIndicator();
+        toggleScrollButton();
+
     </script>
 </body>
 </html>
