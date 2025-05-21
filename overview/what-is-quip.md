@@ -1,11 +1,9 @@
 # 💡 What is quip?
 
-{% hint style="info" %}
-**GitBook tip:** A succinct video overview is a great way to introduce folks to your product. Embed a Loom, Vimeo or YouTube video and you're good to go! We love this video from the fine folks at Loom as a perfect example of a succinct feature overview.
-{% endhint %}
+quip is a GUI for [OpenRouter](what-is-quip.md#whats-openrouter) that let's you talk to a large selection of AI models without paying a dime! (Literally, you do not pay<mark style="color:purple;">\*</mark>)
 
-## Video overview
+## What's OpenRouter?
 
-Got 2 minutes? Check out a video overview of our product:
+OpenRouter is a service that lets you chat to any AI model you want! quip simply makes the process of talking to any AI you wish easier!
 
-{% embed url="https://www.loom.com/embed/3bfa83acc9fd41b7b98b803ba9197d90" %}
+<sup><mark style="color:purple;">\*<mark style="color:purple;"></sup><sup>Soon quip will have a paid AI's section where you can use paid AI models.</sup>&#x20;
