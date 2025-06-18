@@ -112,7 +112,7 @@
                 <li>sign up or log in to your account.</li>
                 <li>click your profile in the <b>top right</b>, then 'keys' from the drop down menu.</li>
                 <li>now click 'create key' (or use an existing one).</li>
-                <li>copy and <b>save</b> the API key and paste it into the input field above.</li>
+                <li>copy and <b>save</b> the api key and paste it into the input field above.</li>
             </ol>
         </div>
     </div>
@@ -124,9 +124,32 @@
         apiKeyInput.value = localStorage.getItem("openrouter_api") || "";
         aiModelSelect.value = localStorage.getItem("ai_model") || "qwen/qwq-32b:free";
 
+        function validateApiKey(key) {
+            // Check if key is empty
+            if (!key || key.trim() === '') {
+                return false;
+            }
+            
+            // Basic check for OpenRouter API key format (usually starts with sk-)
+            if (key.startsWith('sk-')) {
+                return true;
+            }
+            
+            // If not starting with sk-, at least ensure it's a reasonable length
+            return key.trim().length >= 8;
+        }
+        
         function saveSettings() {
-            localStorage.setItem("openrouter_api", apiKeyInput.value);
+            const apiKey = apiKeyInput.value.trim();
+            
+            if (!validateApiKey(apiKey)) {
+                alert("Please enter a valid API key. OpenRouter API keys typically start with 'sk-'");
+                return;
+            }
+            
+            localStorage.setItem("openrouter_api", apiKey);
             localStorage.setItem("ai_model", aiModelSelect.value);
+            alert("Settings saved successfully!");
             window.location.href = "index.html";
         }
 

@@ -235,10 +235,15 @@ function selectChat(chatId) {
                 return;
             }
 
-            if (!apiKey) {
-                alert("api key is missing. please go to settings and enter an api key!");
+            // Check for API key presence and format
+            if (!apiKey || apiKey.trim() === '') {
+                alert("API key is missing. Please go to settings and enter an OpenRouter API key!");
+                window.location.href = "settings.html";
                 return;
             }
+            
+            // Refresh the API key from localStorage in case it was updated
+            apiKey = localStorage.getItem("openrouter_api");
 
             const currentChat = allChats[currentChatId];
             if (!currentChat) {
@@ -246,10 +251,11 @@ function selectChat(chatId) {
                  return;
             }
 
-            const timestamp = new Date().toLocaleTimeString();
+            const timestamp = new Date().toISOString(); // Store complete date in ISO format for analytics
+            const displayTime = new Date().toLocaleTimeString(); // Keep time-only format for display
             // Add user message to the current chat's history and render it
             addMessageToChat(currentChatId, message, true, timestamp);
-            renderMessage(message, true, timestamp); // Render user message immediately
+            renderMessage(message, true, displayTime); // Render user message immediately with display time
             userInput.value = "";
             typingIndicator.style.display = "block";
             scrollToBottom();
@@ -267,36 +273,50 @@ function selectChat(chatId) {
                         messages: currentChat.conversationHistory // Use current chat's history
                     })
                 });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    let errorMessage = "API request failed.";
+                    
+                    if (response.status === 401 || response.status === 403) {
+                        errorMessage = "API key is invalid or expired. Please update your API key in settings.";
+                        localStorage.removeItem("openrouter_api"); // Clear invalid API key
+                    } else if (response.status === 429) {
+                        errorMessage = "Rate limit exceeded. Please try again later.";
+                    } else if (errorData.error && errorData.error.message) {
+                        errorMessage = `Error: ${errorData.error.message}`;
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
 
                 if (!response.ok) {
+                    // This should never happen as we already handled it above
                     const errorText = await response.text();
-                    if (response.status === 401) {
-                        throw new Error("authentication failed. please check your api key.");
-                    } else if (response.status === 429) {
-                        throw new Error("rate limit exceeded. please wait before sending more requests.");
-                    } else if (response.status >= 500) {
-                        throw new Error(`server error: ${response.status} - ${response.statusText}\\nDetails: ${errorText}`);
-                    } else if (response.status === 404) {
-                        throw new Error("endpoint not found. please check the api url.");
-                    } else {
-                        throw new Error(`unexpected error: ${response.status} - ${response.statusText}\\nDetails: ${errorText}`);
-                    }
+                    throw new Error(`Request failed with status: ${response.status}`);
                 }
 
                 const data = await response.json();
                 const botReply = data.choices[0]?.message?.content || "error: no response from ai.";
-                const botTimestamp = new Date().toLocaleTimeString();
+                const botTimestamp = new Date().toISOString(); // Full ISO date for storage
+                const botDisplayTime = new Date().toLocaleTimeString(); // Time-only for display
                 // Add bot message to the current chat's history and render it
                 addMessageToChat(currentChatId, botReply, false, botTimestamp);
-                renderMessage(botReply, false, botTimestamp);
+                renderMessage(botReply, false, botDisplayTime);
                 scrollToBottom();
 
             } catch (error) {
                 console.error("error during api call:", error);
-                const errorTimestamp = new Date().toLocaleTimeString();
-                // Display user-friendly error messages in the chat
-                let errorMessage = "an unknown error occurred. please contact support if the issue persists.";
-                if (error.message.includes("authentication failed")) {
+                const errorTimestamp = new Date().toISOString(); // Full ISO date for storage
+                const errorDisplayTime = new Date().toLocaleTimeString(); // Time-only for display
+                
+                // Handle specific error messages
+                let errorMessage = error.message;
+                
+                // If this is an API key error, provide direct link to settings
+                if (error.message.includes("API key is invalid") || 
+                    error.message.includes("authentication failed") || 
+                    error.message.toLowerCase().includes("api key")) {
                     errorMessage = "authentication failed. please check your api key in the settings.";
                 } else if (error.message.includes("rate limit exceeded")) {
                     errorMessage = "rate limit exceeded. please wait a while before trying again.";
@@ -308,7 +328,7 @@ function selectChat(chatId) {
                     errorMessage = "an unexpected error occurred. please try again later.";
                 }
                 addMessageToChat(currentChatId, errorMessage, false, errorTimestamp);
-                renderMessage(errorMessage, false, errorTimestamp);
+                renderMessage(errorMessage, false, errorDisplayTime);
                 scrollToBottom();
 
             } finally {

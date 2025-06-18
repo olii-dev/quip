@@ -22,12 +22,12 @@
         <header class="analytics-header">
             <h2 class="header-2"><i class="fas fa-chart-bar"></i> analytics dashboard</h2>
             <div class="filter-container">
-                <label for="timeRange">time range:</label>
+                <label for="timeRange">Time Range:</label>
                 <select id="timeRange" onchange="updateAnalytics()">
-                    <option value="all">all time</option>
-                    <option value="7">last 7 days</option>
-                    <option value="30">last 30 days</option>
-                    <option value="90">last 90 days</option>
+                    <option value="all">All Time</option>
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
                 </select>
                 <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
             </div>
@@ -35,7 +35,7 @@
 
         <!-- Key metrics section -->
         <div class="analytics-section">
-            <h3 class="section-title">key metrics</h3>
+            <h3 class="section-title">Key Metrics</h3>
             <div class="analytics-content">
                 <div class="stat-box">
                     <h3>total messages exchanged</h3>
@@ -67,7 +67,7 @@
 
         <!-- Message Activity Chart -->
         <div class="analytics-section">
-            <h3 class="section-title">message activity</h3>
+            <h3 class="section-title">Message Activity</h3>
             <div class="chart-container">
                 <canvas id="messageActivityChart"></canvas>
             </div>
@@ -75,16 +75,16 @@
         
         <!-- Usage Patterns -->
         <div class="analytics-section">
-            <h3 class="section-title">usage patterns</h3>
+            <h3 class="section-title">Usage Patterns</h3>
             <div class="usage-grid">
                 <div class="usage-card">
-                    <h4>active hours</h4>
+                    <h4>Active Hours</h4>
                     <div class="mini-chart">
                         <canvas id="hourlyActivityChart"></canvas>
                     </div>
                 </div>
                 <div class="usage-card">
-                    <h4>weekly activity</h4>
+                    <h4>Weekly Activity</h4>
                     <div class="mini-chart">
                         <canvas id="weeklyActivityChart"></canvas>
                     </div>
@@ -94,7 +94,7 @@
         
         <!-- Response Quality -->
         <div class="analytics-section">
-            <h3 class="section-title">interaction details</h3>
+            <h3 class="section-title">Interaction Details</h3>
             <div class="analytics-content">
                 <div class="stat-box">
                     <h3>avg response time</h3>
@@ -117,35 +117,35 @@
         
         <!-- Topic Analysis -->
         <div class="analytics-section">
-            <h3 class="section-title">top keywords</h3>
+            <h3 class="section-title">Top Keywords</h3>
             <div id="keywordsCloud" class="keywords-cloud"></div>
         </div>
 
         <!-- Sentiment Analysis -->
         <div class="analytics-section">
-            <h3 class="section-title">conversation sentiment</h3>
+            <h3 class="section-title">Conversation Sentiment</h3>
             <div class="sentiment-container">
                 <div class="sentiment-gauge-container">
                     <canvas id="sentimentGauge"></canvas>
                     <div class="sentiment-score" id="overallSentiment">--</div>
                 </div>
                 <div class="sentiment-trends">
-                    <h4>sentiment over time</h4>
+                    <h4>Sentiment over time</h4>
                     <div class="mini-chart">
                         <canvas id="sentimentTrendChart"></canvas>
                     </div>
                 </div>
             </div>
             <div class="sentiment-legend">
-                <div class="sentiment-item"><span class="sentiment-dot negative"></span>negative</div>
-                <div class="sentiment-item"><span class="sentiment-dot neutral"></span>neutral</div>
-                <div class="sentiment-item"><span class="sentiment-dot positive"></span>positive</div>
+                <div class="sentiment-item"><span class="sentiment-dot negative"></span>Negative</div>
+                <div class="sentiment-item"><span class="sentiment-dot neutral"></span>Neutral</div>
+                <div class="sentiment-item"><span class="sentiment-dot positive"></span>Positive</div>
             </div>
         </div>
         
         <!-- AI Model Usage -->
         <div class="analytics-section">
-            <h3 class="section-title">ai model usage</h3>
+            <h3 class="section-title">AI Model Usage</h3>
             <div class="chart-container half-height">
                 <canvas id="modelUsageChart"></canvas>
             </div>
@@ -153,16 +153,16 @@
         
         <!-- Export Analytics -->
         <div class="analytics-section">
-            <h3 class="section-title">data export</h3>
+            <h3 class="section-title">Data Export</h3>
             <div class="export-options">
                 <button class="export-button" onclick="exportAnalyticsData('json')">
-                    <i class="fas fa-file-code"></i> export as json
+                    <i class="fas fa-file-code"></i> Export as JSON
                 </button>
                 <button class="export-button" onclick="exportAnalyticsData('csv')">
-                    <i class="fas fa-file-csv"></i> export as csv
+                    <i class="fas fa-file-csv"></i> Export as CSV
                 </button>
                 <button class="export-button" onclick="exportAnalyticsData('pdf')">
-                    <i class="fas fa-file-pdf"></i> export as pdf
+                    <i class="fas fa-file-pdf"></i> Export as PDF
                 </button>
             </div>
         </div>
@@ -624,8 +624,7 @@
                             }
                         }
                     }
-                }
-            });
+                });
         }
         
         function createWeeklyActivityChart(allChats, dateFilter) {
@@ -1081,8 +1080,7 @@
                             }
                         }
                     }
-                }
-            });
+                });
         }
         
         function exportAnalyticsData(format) {
@@ -1140,19 +1138,19 @@
         function convertToCSV(data) {
             // Flatten the nested object structure
             const flatData = {
-                'generated at': new Date(data.generatedAt).toLocaleString(),
-                'time range': data.timeRange === 'all' ? 'all time' : `last ${data.timeRange} days`,
-                'total messages': data.basicStats.totalMessages,
-                'user messages': data.basicStats.userMessages,
-                'ai messages': data.basicStats.aiMessages,
-                'conversation turns': data.basicStats.conversationTurns,
-                'total chats': data.basicStats.totalChats,
-                'average message length': data.basicStats.avgMessageLength,
-                'average response time': data.advancedMetrics.avgResponseTime,
-                'longest conversation': data.advancedMetrics.longestConversation,
-                'most active chat': data.advancedMetrics.mostActiveChat,
-                'peak hour': data.advancedMetrics.peakHour,
-                'overall sentiment': data.sentiment.overallSentiment
+                'Generated At': new Date(data.generatedAt).toLocaleString(),
+                'Time Range': data.timeRange === 'all' ? 'All Time' : `Last ${data.timeRange} Days`,
+                'Total Messages': data.basicStats.totalMessages,
+                'User Messages': data.basicStats.userMessages,
+                'AI Messages': data.basicStats.aiMessages,
+                'Conversation Turns': data.basicStats.conversationTurns,
+                'Total Chats': data.basicStats.totalChats,
+                'Average Message Length': data.basicStats.avgMessageLength,
+                'Average Response Time': data.advancedMetrics.avgResponseTime,
+                'Longest Conversation': data.advancedMetrics.longestConversation,
+                'Most Active Chat': data.advancedMetrics.mostActiveChat,
+                'Peak Hour': data.advancedMetrics.peakHour,
+                'Overall Sentiment': data.sentiment.overallSentiment
             };
             
             // Create CSV header and content
@@ -1180,7 +1178,7 @@
             }, 100);
             
             // Show export notification
-            const format = filename.split('.').pop().toLowerCase();
+            const format = filename.split('.').pop().toUpperCase();
             showExportNotification(`${format} successfully exported`);
         }
         
@@ -1206,15 +1204,15 @@
             
             // Add title
             pdf.setFontSize(24);
-            pdf.text('quip analytics report', 40, 50);
+            pdf.text('Quip Analytics Report', 40, 50);
             
             // Add generated date
             pdf.setFontSize(10);
-            pdf.text(`generated at: ${new Date(analyticsData.generatedAt).toLocaleString()}`, 40, 80);
+            pdf.text(`Generated at: ${new Date(analyticsData.generatedAt).toLocaleString()}`, 40, 80);
             
             // Add time range
             pdf.setFontSize(12);
-            pdf.text(`time range: ${analyticsData.timeRange === 'all' ? 'all time' : `last ${analyticsData.timeRange} days`}`, 40, 100);
+            pdf.text(`Time Range: ${analyticsData.timeRange === 'all' ? 'All Time' : `Last ${analyticsData.timeRange} Days`}`, 40, 100);
             
             // Add a line break
             pdf.setLineWidth(0.5);
@@ -1222,7 +1220,7 @@
             
             // Add basic statistics section
             pdf.setFontSize(18);
-            pdf.text('basic statistics', 40, 130);
+            pdf.text('Basic Statistics', 40, 130);
             
             pdf.setFontSize(12);
             const basicStats = analyticsData.basicStats;
@@ -1239,7 +1237,7 @@
             
             // Add advanced metrics section
             pdf.setFontSize(18);
-            pdf.text('advanced metrics', 40, basicStatsY + rowHeight + 20);
+            pdf.text('Advanced Metrics', 40, basicStatsY + rowHeight + 20);
             
             pdf.setFontSize(12);
             const advancedMetrics = analyticsData.advancedMetrics;
@@ -1256,7 +1254,7 @@
             
             // Add sentiment section
             pdf.setFontSize(18);
-            pdf.text('sentiment analysis', 40, advancedMetricsY + rowHeight + 20);
+            pdf.text('Sentiment Analysis', 40, advancedMetricsY + rowHeight + 20);
             
             pdf.setFontSize(12);
             const sentiment = analyticsData.sentiment;
@@ -1273,13 +1271,13 @@
             
             // Add footer
             pdf.setFontSize(10);
-            pdf.text('data exported from quip - analytics', 40, pdf.internal.pageSize.height - 40);
+            pdf.text('Data exported from Quip - analytics', 40, pdf.internal.pageSize.height - 40);
             
             // Save the PDF
             pdf.save('quip_analytics_report.pdf');
             
             // Show export notification
-            showExportNotification('pdf successfully exported');
+            showExportNotification('PDF successfully exported');
         }
     </script>
 </body>
