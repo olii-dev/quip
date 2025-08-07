@@ -17,7 +17,7 @@
     <!-- html2canvas for capturing charts in PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
-<body>
+<body class="analytics-page-body">
     <div class="settings-container analytics-expanded">
         <header class="analytics-header">
             <h2 class="header-2"><i class="fas fa-chart-bar"></i> analytics dashboard</h2>
@@ -1281,6 +1281,23 @@
             // Show export notification
             showExportNotification('pdf successfully exported');
         }
+
+        // Fix scrolling on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ensure body can scroll
+            document.body.style.overflow = 'auto';
+            document.body.style.overflowX = 'hidden';
+            document.body.style.height = 'auto';
+            document.body.style.minHeight = '100vh';
+            
+            // Ensure analytics container can scroll
+            const analyticsContainer = document.querySelector('.analytics-expanded');
+            if (analyticsContainer) {
+                analyticsContainer.style.maxHeight = '90vh';
+                analyticsContainer.style.overflowY = 'auto';
+                analyticsContainer.style.overflowX = 'hidden';
+            }
+        });
     </script>
 </body>
 </html>

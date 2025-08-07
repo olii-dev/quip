@@ -13,35 +13,135 @@
 </head>
 <body>
     <div class="container" id="app-container">
-        <header>
-            <h2>quip</h2>
-            <div class="header-buttons">
-                <button class="new-chat-button" onclick="createChat()"><i class="fas fa-plus-circle"></i> new chat</button>
-                <select id="chatSelect" onchange="selectChat(this.value)"></select>
-                <button class="settings-button" onclick="window.location.href='settings.html'"><i class="fas fa-cog"></i></button>
-                <button class="analytics-button" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-bar"></i></button>
-                <button class="search-toggle" onclick="toggleSearchBar()"><i class="fas fa-search"></i></button>
-                <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
-            </div>
-        </header>
-        <div id="currentChatTitle" class="current-chat-title" onclick="renameChat(currentChatId)"></div>
-        <div class="search-bar" id="searchBar">
-            <input type="text" id="searchInput" placeholder="search messages..." oninput="searchMessages()">
+        <div class="sidebar-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
         </div>
-        <div id="chatbox"></div>
-        <div id="typing-indicator" class="typing-indicator">
-            <span id="typing" style="font-size: 16px; color: white;">typing</span>
-            <span class="dot" id="dot1"></span>
-            <span class="dot" id="dot2"></span>
-            <span class="dot" id="dot3"></span>
-        </div>
-        <footer>
-            <div class="input-container">
-                <input type="text" id="userInput" placeholder="type your message..." onkeydown="handleEnterKey(event)">
-                <button onclick="sendMessage()" style="margin-right: 10px;"><i class="fas fa-paper-plane"></i></button>
-                <button class="scroll-bottom-button" onclick="scrollToBottom()"><i class="fas fa-arrow-down"></i></button>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>quip</h2>
+                <button class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></button>
             </div>
-        </footer>
+            <div class="sidebar-content">
+                <div class="sidebar-section">
+                    <button class="new-chat-button" onclick="createChat()"><i class="fas fa-plus-circle"></i> new chat</button>
+                    <div class="chat-filters">
+                        <button class="filter-button" data-filter="all" onclick="filterChats('all')">all chats</button>
+                        <button class="filter-button" data-filter="favorites" onclick="filterChats('favorites')">favorites</button>
+                    </div>
+                    <div class="category-section">
+                        <h3>categories</h3>
+                        <div id="categoryList" class="category-list"></div>
+                    </div>
+                    <div class="tag-section">
+                        <h3>tags</h3>
+                        <div id="tagList" class="tag-list"></div>
+                    </div>
+                </div>
+                <div class="chat-list-container">
+                    <div class="chat-list-header">
+                        <span>your chats</span>
+                        <div class="sort-dropdown">
+                            <select id="sortChats" onchange="sortChats(this.value)">
+                                <option value="newest">newest</option>
+                                <option value="oldest">oldest</option>
+                                <option value="recent">recently active</option>
+                                <option value="alphabetical">a-z</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="chatList" class="chat-list"></div>
+                </div>
+                <div class="sidebar-footer">
+                    <button class="settings-button" onclick="window.location.href='settings.html'"><i class="fas fa-cog"></i> settings</button>
+                    <button class="analytics-button" onclick="window.location.href='analytics.html'"><i class="fas fa-chart-bar"></i> analytics</button>
+                    <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <header>
+                <div id="currentChatTitle" class="current-chat-title" onclick="renameChat(currentChatId)"></div>
+                <div class="header-buttons">
+                    <button class="chat-options-button" onclick="showChatOptions()"><i class="fas fa-ellipsis-h"></i></button>
+                    <button class="search-toggle" onclick="toggleSearchBar()"><i class="fas fa-search"></i></button>
+                </div>
+            </header>
+            <div class="search-bar" id="searchBar">
+                <input type="text" id="searchInput" placeholder="search messages..." oninput="searchMessages()">
+            </div>
+            <div id="chatbox"></div>
+            <div id="typing-indicator" class="typing-indicator">
+                <span id="typing" style="font-size: 16px; color: white;">typing</span>
+                <span class="dot" id="dot1"></span>
+                <span class="dot" id="dot2"></span>
+                <span class="dot" id="dot3"></span>
+            </div>
+            <footer>
+                <div class="input-container">
+                    <input type="text" id="userInput" placeholder="type your message..." onkeydown="handleEnterKey(event)">
+                    <button onclick="sendMessage()" style="margin-right: 10px;"><i class="fas fa-paper-plane"></i></button>
+                    <button class="scroll-bottom-button" onclick="scrollToBottom()"><i class="fas fa-arrow-down"></i></button>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Chat Options Modal -->
+    <div id="chatOptionsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="hideChatOptions()">&times;</span>
+            <h3>chat options</h3>
+            <div class="options-list">
+                <div class="option-item" onclick="renameChat(currentChatId)">
+                    <i class="fas fa-pencil-alt"></i> rename chat
+                </div>
+                <div class="option-item" onclick="toggleFavorite(currentChatId)">
+                    <i class="fas fa-star" id="favoriteIcon"></i> <span id="favoriteText">add to favorites</span>
+                </div>
+                <div class="option-item" onclick="showCategoryModal()">
+                    <i class="fas fa-folder"></i> set category
+                </div>
+                <div class="option-item" onclick="showTagsModal()">
+                    <i class="fas fa-tags"></i> manage tags
+                </div>
+                <div class="option-item delete-option" onclick="deleteChat(currentChatId)">
+                    <i class="fas fa-trash"></i> delete chat
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="hideCategoryModal()">&times;</span>
+            <h3>set category</h3>
+            <div class="category-options" id="categoryOptions">
+                <!-- Will be populated dynamically -->
+            </div>
+            <div class="new-category-input">
+                <input type="text" id="newCategoryInput" placeholder="create new category...">
+                <button onclick="addNewCategory()">add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tags Modal -->
+    <div id="tagsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="hideTagsModal()">&times;</span>
+            <h3>manage tags</h3>
+            <div class="current-tags" id="currentTags">
+                <!-- Will be populated dynamically -->
+            </div>
+            <div class="new-tag-input">
+                <input type="text" id="newTagInput" placeholder="add new tag...">
+                <button onclick="addTagToChatId()">add</button>
+            </div>
+            <div class="common-tags" id="commonTags">
+                <!-- Will be populated with commonly used tags -->
+            </div>
+        </div>
     </div>
 
     <script>
@@ -51,12 +151,21 @@
         const typingIndicator = document.getElementById("typing-indicator");
         const searchInput = document.getElementById("searchInput");
         const searchBar = document.getElementById("searchBar");
-        const chatSelect = document.getElementById("chatSelect");
+        const sidebar = document.getElementById("sidebar");
+        const chatList = document.getElementById("chatList");
+        const categoryList = document.getElementById("categoryList");
+        const tagList = document.getElementById("tagList");
+        const currentChatTitle = document.getElementById("currentChatTitle");
+        const chatSelect = document.getElementById("chatSelect"); // Make sure this is defined
 
         let apiKey = localStorage.getItem("openrouter_api");
         let aiModel = localStorage.getItem("ai_model") || "qwen/qwq-32b:free";
         let allChats = JSON.parse(localStorage.getItem("allChats")) || {};
         let currentChatId = localStorage.getItem("currentChatId") || null;
+        let currentFilter = "all";
+        let currentSort = "newest";
+        let currentCategory = null;
+        let currentTag = null;
 
         // Ensure there's at least one chat
         if (Object.keys(allChats).length === 0) {
@@ -64,6 +173,35 @@
         } else if (!currentChatId || !allChats[currentChatId]) {
              currentChatId = Object.keys(allChats)[0]; // Select the first chat if current is invalid
              saveCurrentChatId();
+        }
+
+        // Sidebar toggle function
+        function toggleSidebar() {
+            console.log("Toggle sidebar called");
+            sidebar.classList.toggle("open");
+            document.getElementById("app-container").classList.toggle("sidebar-open");
+        }
+
+        // Initialize chats with required fields if they're missing
+        function initChats() {
+            for (const chatId in allChats) {
+                if (!allChats[chatId].createdAt) {
+                    allChats[chatId].createdAt = new Date().toISOString();
+                }
+                if (!allChats[chatId].lastActive) {
+                    allChats[chatId].lastActive = new Date().toISOString();
+                }
+                if (!allChats[chatId].tags) {
+                    allChats[chatId].tags = [];
+                }
+                if (!allChats[chatId].category) {
+                    allChats[chatId].category = "uncategorized";
+                }
+                if (allChats[chatId].isFavorite === undefined) {
+                    allChats[chatId].isFavorite = false;
+                }
+            }
+            saveAllChats();
         }
 
         function saveAllChats() {
@@ -82,7 +220,10 @@
                  allChats[chatId].conversationHistory = [];
             }
             allChats[chatId].conversationHistory.push({ role: isUser ? "user" : "assistant", content: text });
-
+            
+            // Update lastActive timestamp
+            allChats[chatId].lastActive = new Date().toISOString();
+            
             saveAllChats();
         }
 
@@ -97,136 +238,507 @@
 
 
 function loadChats() {
-    // Populate chat select dropdown
-    chatSelect.innerHTML = ""; // Clear existing options
+    // Initialize chats to make sure they have all required fields
+    initChats();
     
-    for (const chatId in allChats) {
-        const option = document.createElement("option");
-        option.value = chatId;
-        option.textContent = allChats[chatId].title; // Use the custom title
-        if (chatId === currentChatId) {
-            option.selected = true;
-        }
-        chatSelect.appendChild(option);
-    }
-    
-    // Add management options at the end of the dropdown
-    const separator = document.createElement("option");
-    separator.disabled = true;
-    separator.textContent = "─────────────";
-    chatSelect.appendChild(separator);
-    
-    const renameOption = document.createElement("option");
-    renameOption.value = "rename";
-    renameOption.textContent = "⚙️ rename current chat";
-    chatSelect.appendChild(renameOption);
-    
-    // Only add delete option if there's more than one chat
-    if (Object.keys(allChats).length > 1) {
-        const deleteOption = document.createElement("option");
-        deleteOption.value = "delete";
-        deleteOption.textContent = "🗑️ delete current chat";
-        chatSelect.appendChild(deleteOption);
-    }
+    // Load categories, tags, and chat list
+    loadCategories();
+    loadTags();
+    loadChatList();
     
     // Load messages for the current chat
     chatbox.innerHTML = ""; // Clear current messages
     if (allChats[currentChatId] && allChats[currentChatId].messages) {
-        allChats[currentChatId].messages.forEach(msg => renderMessage(msg.text, msg.isUser, msg.timestamp));
+        allChats[currentChatId].messages.forEach(msg => {
+            const displayTime = new Date(msg.timestamp).toLocaleTimeString();
+            renderMessage(msg.text, msg.isUser, displayTime);
+        });
         scrollToBottom(); // Scroll to the latest message
     }
 
-    if (document.getElementById("currentChatTitle")) {
-        document.getElementById("currentChatTitle").textContent = allChats[currentChatId]?.title || "";
+    // Set the current chat title
+    if (currentChatTitle) {
+        currentChatTitle.textContent = allChats[currentChatId]?.title || "";
     }
+    
+    // Update favorite icon in chat options modal
+    updateFavoriteButton();
 }
 
-function createChat() {
-    const defaultTitle = `chat ${Object.keys(allChats).length + 1}`;
-    const MAX_TITLE_LENGTH = 40; // Set maximum title length
-    let customTitle = prompt("enter a name for your new chat (max 40 char):", defaultTitle);
+function loadChatList() {
+            chatList.innerHTML = '';
+            
+            // Apply filter, category, and tag filters
+            let filteredChatIds = Object.keys(allChats);
+            
+            if (currentFilter === "favorites") {
+                filteredChatIds = filteredChatIds.filter(chatId => allChats[chatId].isFavorite);
+            }
+            
+            if (currentCategory) {
+                filteredChatIds = filteredChatIds.filter(chatId => allChats[chatId].category === currentCategory);
+            }
+            
+            if (currentTag) {
+                filteredChatIds = filteredChatIds.filter(chatId => 
+                    allChats[chatId].tags && 
+                    Array.isArray(allChats[chatId].tags) && 
+                    allChats[chatId].tags.includes(currentTag)
+                );
+            }
+            
+            // Apply sort
+            filteredChatIds.sort((a, b) => {
+                const chatA = allChats[a];
+                const chatB = allChats[b];
+                
+                switch (currentSort) {
+                    case "newest":
+                        return new Date(chatB.createdAt) - new Date(chatA.createdAt);
+                    case "oldest":
+                        return new Date(chatA.createdAt) - new Date(chatB.createdAt);
+                    case "recent":
+                        return new Date(chatB.lastActive) - new Date(chatA.lastActive);
+                    case "alphabetical":
+                        return chatA.title.localeCompare(chatB.title);
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Create chat items
+            filteredChatIds.forEach(chatId => {
+                const chat = allChats[chatId];
+                const chatItem = document.createElement('div');
+                chatItem.className = `chat-item ${chatId === currentChatId ? 'active' : ''} ${chat.isFavorite ? 'favorite' : ''}`;
+                chatItem.onclick = () => selectChat(chatId);
+                
+                // Format chat date
+                const createdDate = new Date(chat.createdAt);
+                const formattedDate = createdDate.toLocaleDateString();
+                
+                chatItem.innerHTML = `
+                    <div class="chat-item-header">
+                        <div class="chat-name">
+                            <i class="fas fa-star favorite-icon"></i>${chat.title}
+                        </div>
+                        <div class="chat-controls">
+                            <button class="chat-control-btn" onclick="event.stopPropagation(); toggleFavorite('${chatId}')">
+                                <i class="fas ${chat.isFavorite ? 'fa-star' : 'fa-star-o'}"></i>
+                            </button>
+                            <button class="chat-control-btn" onclick="event.stopPropagation(); renameChat('${chatId}')">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chat-meta">
+                        <span>${formattedDate}</span>
+                        <span class="chat-category">${chat.category || 'uncategorized'}</span>
+                    </div>
+                    ${chat.tags && chat.tags.length > 0 ? 
+                        `<div class="chat-tags">
+                            ${chat.tags.map(tag => `<span class="chat-tag">${tag}</span>`).join('')}
+                        </div>` : ''}
+                `;
+                
+                chatList.appendChild(chatItem);
+            });
+        }
+
+        function loadCategories() {
+            // Get unique categories
+            const categories = new Set();
+            for (const chatId in allChats) {
+                if (allChats[chatId].category) {
+                    categories.add(allChats[chatId].category);
+                }
+            }
+            
+            categoryList.innerHTML = '';
+            
+            // Create category items
+            categories.forEach(category => {
+                const categoryItem = document.createElement('div');
+                categoryItem.className = 'category-item';
+                categoryItem.textContent = category;
+                categoryItem.dataset.category = category;
+                categoryItem.onclick = () => filterByCategory(category);
+                categoryList.appendChild(categoryItem);
+                
+                // Set active if it's the current category
+                if (currentCategory === category) {
+                    categoryItem.classList.add('active');
+                }
+            });
+        }
+
+        function loadTags() {
+            // Get all unique tags
+            const tags = new Set();
+            for (const chatId in allChats) {
+                if (allChats[chatId].tags && Array.isArray(allChats[chatId].tags)) {
+                    allChats[chatId].tags.forEach(tag => tags.add(tag));
+                }
+            }
+            
+            tagList.innerHTML = '';
+            
+            // Create tag items
+            tags.forEach(tag => {
+                const tagItem = document.createElement('div');
+                tagItem.className = 'tag-item';
+                tagItem.textContent = tag;
+                tagItem.dataset.tag = tag;
+                tagItem.onclick = () => filterByTag(tag);
+                tagList.appendChild(tagItem);
+                
+                // Set active if it's the current tag
+                if (currentTag === tag) {
+                    tagItem.classList.add('active');
+                }
+            });
+        }
+
+        function saveAllChats() {
+            localStorage.setItem("allChats", JSON.stringify(allChats));
+        }
+
+        function saveCurrentChatId() {
+            localStorage.setItem("currentChatId", currentChatId);
+        }
+
+        function addMessageToChat(chatId, text, isUser, timestamp) {
+            if (!allChats[chatId]) return;
+            allChats[chatId].messages.push({ text, isUser, timestamp });
+            // Only save conversation history for the AI model interaction
+            if (!allChats[chatId].conversationHistory) {
+                 allChats[chatId].conversationHistory = [];
+            }
+            allChats[chatId].conversationHistory.push({ role: isUser ? "user" : "assistant", content: text });
+            
+            // Update lastActive timestamp
+            allChats[chatId].lastActive = new Date().toISOString();
+            
+            saveAllChats();
+        }
+
+        function renderMessage(text, isUser, timestamp) {
+            const msg = document.createElement("div");
+            msg.className = `message ${isUser ? "user" : "bot"}`;
+            // Sanitize and parse markdown
+            const cleanHTML = DOMPurify.sanitize(marked.parse(text));
+            msg.innerHTML = `<span class="message-text">${cleanHTML}</span><span class="timestamp">${timestamp}</span>`;
+            chatbox.appendChild(msg);
+        }
+
+
+function loadChats() {
+    // Initialize chats to make sure they have all required fields
+    initChats();
     
-    // User canceled the prompt
-    if (customTitle === null) return;
+    // Load categories, tags, and chat list
+    loadCategories();
+    loadTags();
+    loadChatList();
     
-    // Trim if exceeds maximum length
-    if (customTitle && customTitle.length > MAX_TITLE_LENGTH) {
-        customTitle = customTitle.substring(0, MAX_TITLE_LENGTH) + "...";
+    // Load messages for the current chat
+    chatbox.innerHTML = ""; // Clear current messages
+    if (allChats[currentChatId] && allChats[currentChatId].messages) {
+        allChats[currentChatId].messages.forEach(msg => {
+            const displayTime = new Date(msg.timestamp).toLocaleTimeString();
+            renderMessage(msg.text, msg.isUser, displayTime);
+        });
+        scrollToBottom(); // Scroll to the latest message
+    }
+
+    // Set the current chat title
+    if (currentChatTitle) {
+        currentChatTitle.textContent = allChats[currentChatId]?.title || "";
     }
     
-    // Use the custom title if provided, otherwise use the default
-    const chatTitle = customTitle || defaultTitle;
-    
-    const newChatId = Date.now().toString(); // Simple unique ID
-    allChats[newChatId] = {
-        title: chatTitle,
-        messages: [],
-        conversationHistory: []
-    };
-    
-    currentChatId = newChatId;
-    saveAllChats();
-    saveCurrentChatId();
-    loadChats(); // Load the new chat
+    // Update favorite icon in chat options modal
+    updateFavoriteButton();
 }
 
-function deleteChat(chatId) {
-    if (!allChats[chatId] || Object.keys(allChats).length <= 1) return; // Don't delete the last chat
-    
-    if (confirm("Are you sure you want to delete this chat?")) {
-        delete allChats[chatId];
-        saveAllChats();
-        
-        // Select another chat
-        currentChatId = Object.keys(allChats)[0];
-        saveCurrentChatId();
-        
-        loadChats(); // Refresh the chat list and load the new current chat
-    }
-}
+        function createChat() {
+            const defaultTitle = `chat ${Object.keys(allChats).length + 1}`;
+            const MAX_TITLE_LENGTH = 40; // Set maximum title length
+            let customTitle = prompt("enter a name for your new chat (max 40 char):", defaultTitle);
+            
+            // User canceled the prompt
+            if (customTitle === null) return;
+            
+            // Trim if exceeds maximum length
+            if (customTitle && customTitle.length > MAX_TITLE_LENGTH) {
+                customTitle = customTitle.substring(0, MAX_TITLE_LENGTH) + "...";
+            }
+            
+            // Use the custom title if provided, otherwise use the default
+            const chatTitle = customTitle || defaultTitle;
+            
+            const newChatId = Date.now().toString(); // Simple unique ID
+            allChats[newChatId] = {
+                title: chatTitle,
+                messages: [],
+                conversationHistory: [],
+                createdAt: new Date().toISOString(),
+                lastActive: new Date().toISOString(),
+                tags: [],
+                category: "uncategorized",
+                isFavorite: false
+            };
+            
+            currentChatId = newChatId;
+            saveAllChats();
+            saveCurrentChatId();
+            loadChats(); // Load the new chat
+        }
 
-function renameChat(chatId) {
-    if (!allChats[chatId]) return;
+        function deleteChat(chatId) {
+            if (!allChats[chatId] || Object.keys(allChats).length <= 1) return; // Don't delete the last chat
     
-    const currentTitle = allChats[chatId].title;
-    const MAX_TITLE_LENGTH = 40; // Set maximum title length
-    let newTitle = prompt("enter a new name for this chat:", currentTitle);
-    
-    // Trim if exceeds maximum length
-    if (newTitle && newTitle.length > MAX_TITLE_LENGTH) {
-        newTitle = newTitle.substring(0, MAX_TITLE_LENGTH) + "...";
-    }
-    
-    // Only update if the user provided a new name
-    if (newTitle && newTitle !== currentTitle) {
-        allChats[chatId].title = newTitle;
-        saveAllChats();
-        loadChats(); // Refresh the chat list
-    }
-}
+            if (confirm("Are you sure you want to delete this chat?")) {
+                delete allChats[chatId];
+                saveAllChats();
+                
+                // Select another chat
+                currentChatId = Object.keys(allChats)[0];
+                saveCurrentChatId();
+                
+                loadChats(); // Refresh the chat list and load the new current chat
+                hideChatOptions(); // Hide the modal if it was open
+            }
+        }
 
-function selectChat(chatId) {
-    if (chatId === "rename") {
-        // If the "Rename" option is selected, initiate the renaming process
-        renameChat(currentChatId);
-        
-        // Reset the dropdown to select the current chat
-        chatSelect.value = currentChatId;
-        return;
-    }
+        function renameChat(chatId) {
+            if (!allChats[chatId]) return;
     
-    if (chatId === "delete") {
-        // If the "Delete" option is selected, initiate the deletion process
-        deleteChat(currentChatId);
-        
-        // No need to reset dropdown as we'll be switching to another chat
-        return;
-    }
+            const currentTitle = allChats[chatId].title;
+            const MAX_TITLE_LENGTH = 40; // Set maximum title length
+            let newTitle = prompt("enter a new name for this chat:", currentTitle);
+            
+            // Trim if exceeds maximum length
+            if (newTitle && newTitle.length > MAX_TITLE_LENGTH) {
+                newTitle = newTitle.substring(0, MAX_TITLE_LENGTH) + "...";
+            }
     
-    currentChatId = chatId;
-    saveCurrentChatId();
-    loadChats(); // Load the selected chat
-}
+            // Only update if the user provided a new name
+            if (newTitle && newTitle !== currentTitle) {
+                allChats[chatId].title = newTitle;
+                saveAllChats();
+                loadChats(); // Refresh the chat list
+    
+                // If modal is open, hide it
+                hideChatOptions();
+            }
+        }
+
+        function selectChat(chatId) {
+            currentChatId = chatId;
+            saveCurrentChatId();
+    
+            // Update lastActive timestamp
+            if (allChats[chatId]) {
+                allChats[chatId].lastActive = new Date().toISOString();
+                saveAllChats();
+            }
+    
+            loadChats(); // Load the selected chat
+        }
+
+        function toggleFavorite(chatId) {
+            if (!allChats[chatId]) return;
+            
+            allChats[chatId].isFavorite = !allChats[chatId].isFavorite;
+            saveAllChats();
+            loadChats(); // Refresh the chat list
+            
+            // Update favorite icon in chat options modal
+            updateFavoriteButton();
+            
+            // If modal is open, hide it
+            if (event && event.type !== "click") {
+                hideChatOptions();
+            }
+        }
+
+        // Chat options modal functions
+        function showChatOptions() {
+            document.getElementById('chatOptionsModal').style.display = 'block';
+            updateFavoriteButton();
+        }
+
+        function hideChatOptions() {
+            document.getElementById('chatOptionsModal').style.display = 'none';
+        }
+
+        function updateFavoriteButton() {
+            const favoriteIcon = document.getElementById('favoriteIcon');
+            const favoriteText = document.getElementById('favoriteText');
+            
+            if (favoriteIcon && favoriteText && allChats[currentChatId] && allChats[currentChatId].isFavorite) {
+                favoriteIcon.className = 'fas fa-star';
+                favoriteText.textContent = 'remove from favorites';
+            } else if (favoriteIcon && favoriteText) {
+                favoriteIcon.className = 'far fa-star';
+                favoriteText.textContent = 'add to favorites';
+            }
+        }
+
+        // Category modal functions
+        function showCategoryModal() {
+            const categoryModal = document.getElementById('categoryModal');
+            const categoryOptions = document.getElementById('categoryOptions');
+            
+            // Clear existing options
+            categoryOptions.innerHTML = '';
+            
+            // Get unique categories
+            const categories = new Set(['uncategorized']);
+            for (const chatId in allChats) {
+                if (allChats[chatId].category) {
+                    categories.add(allChats[chatId].category);
+                }
+            }
+            
+            // Create category options
+            categories.forEach(category => {
+                const option = document.createElement('div');
+                option.className = `category-option ${allChats[currentChatId].category === category ? 'active' : ''}`;
+                option.textContent = category;
+                option.onclick = () => {
+                    setChatCategory(category);
+                    hideCategoryModal();
+                };
+                categoryOptions.appendChild(option);
+            });
+            
+            categoryModal.style.display = 'block';
+            hideChatOptions();
+        }
+
+        function hideCategoryModal() {
+            document.getElementById('categoryModal').style.display = 'none';
+        }
+
+        function setChatCategory(category) {
+            if (!allChats[currentChatId]) return;
+            
+            allChats[currentChatId].category = category;
+            saveAllChats();
+            loadChats(); // Refresh everything
+        }
+
+        function addNewCategory() {
+            const input = document.getElementById('newCategoryInput');
+            const category = input.value.trim().toLowerCase();
+            
+            if (!category) return;
+            
+            setChatCategory(category);
+            input.value = '';
+            hideCategoryModal();
+        }
+
+        // Tags modal functions
+        function showTagsModal() {
+            const tagsModal = document.getElementById('tagsModal');
+            const currentTags = document.getElementById('currentTags');
+            const commonTags = document.getElementById('commonTags');
+            
+            // Clear existing tags
+            currentTags.innerHTML = '';
+            commonTags.innerHTML = '';
+            
+            // Add current chat's tags
+            if (allChats[currentChatId] && allChats[currentChatId].tags) {
+                allChats[currentChatId].tags.forEach(tag => {
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'current-tag';
+                    tagElement.innerHTML = `
+                        ${tag}
+                        <span class="remove-tag" onclick="removeTag('${tag}')">&times;</span>
+                    `;
+                    currentTags.appendChild(tagElement);
+                });
+            }
+            
+            // Get commonly used tags (from other chats)
+            const commonTagsSet = new Set();
+            for (const chatId in allChats) {
+                if (chatId !== currentChatId && allChats[chatId].tags) {
+                    allChats[chatId].tags.forEach(tag => {
+                        if (!allChats[currentChatId].tags.includes(tag)) {
+                            commonTagsSet.add(tag);
+                        }
+                    });
+                }
+            }
+            
+            // Add common tags section if there are any
+            if (commonTagsSet.size > 0) {
+                const commonTagsTitle = document.createElement('h4');
+                commonTagsTitle.textContent = 'common tags';
+                commonTags.appendChild(commonTagsTitle);
+                
+                const commonTagsList = document.createElement('div');
+                commonTagsList.className = 'common-tags-list';
+                
+                commonTagsSet.forEach(tag => {
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'common-tag';
+                    tagElement.textContent = tag;
+                    tagElement.onclick = () => {
+                        addTagToChat(tag);
+                        showTagsModal(); // Refresh the modal
+                    };
+                    commonTagsList.appendChild(tagElement);
+                });
+                
+                commonTags.appendChild(commonTagsList);
+            }
+            
+            tagsModal.style.display = 'block';
+            hideChatOptions();
+        }
+
+        function hideTagsModal() {
+            document.getElementById('tagsModal').style.display = 'none';
+        }
+
+        function addTagToChatId() {
+            const input = document.getElementById('newTagInput');
+            const tag = input.value.trim().toLowerCase();
+            
+            if (!tag) return;
+            
+            addTagToChat(tag);
+            input.value = '';
+            showTagsModal(); // Refresh the modal
+        }
+
+        function addTagToChat(tag) {
+            if (!allChats[currentChatId]) return;
+            
+            if (!allChats[currentChatId].tags) {
+                allChats[currentChatId].tags = [];
+            }
+            
+            if (!allChats[currentChatId].tags.includes(tag)) {
+                allChats[currentChatId].tags.push(tag);
+                saveAllChats();
+                loadChats(); // Refresh everything
+            }
+        }
+
+        function removeTag(tag) {
+            if (!allChats[currentChatId] || !allChats[currentChatId].tags) return;
+            
+            allChats[currentChatId].tags = allChats[currentChatId].tags.filter(t => t !== tag);
+            saveAllChats();
+            loadChats(); // Refresh everything
+            showTagsModal(); // Refresh the modal
+        }
 
         async function sendMessage() {
             const message = userInput.value.trim();
@@ -423,12 +935,95 @@ function selectChat(chatId) {
             }, 600);
         }
 
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target === modals[i]) {
+                    modals[i].style.display = "none";
+                }
+            }
+        };
+
         // Initial load
         loadChats();
         applySavedTheme();
         animateTypingIndicator();
         toggleScrollButton();
+        searchBar.style.display = "none"; // Hide search bar initially
 
+        function filterChats(filter) {
+            currentFilter = filter;
+            currentCategory = null;
+            currentTag = null;
+            
+            // Update active state of filter buttons
+            document.querySelectorAll('.filter-button').forEach(button => {
+                button.classList.toggle('active', button.dataset.filter === filter);
+            });
+            
+            // Reset category and tag active states
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tag-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            loadChatList();
+        }
+
+        function filterByCategory(category) {
+            currentFilter = "all";
+            currentCategory = category;
+            currentTag = null;
+            
+            // Reset filter buttons active state
+            document.querySelectorAll('.filter-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Set the selected category as active
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.category === category);
+            });
+            
+            // Reset tag active states
+            document.querySelectorAll('.tag-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            loadChatList();
+        }
+
+        function filterByTag(tag) {
+            currentFilter = "all";
+            currentCategory = null;
+            currentTag = tag;
+            
+            // Reset filter buttons active state
+            document.querySelectorAll('.filter-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Reset category active states
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Set the selected tag as active
+            document.querySelectorAll('.tag-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.tag === tag);
+            });
+            
+            loadChatList();
+        }
+
+        function sortChats(sortBy) {
+            currentSort = sortBy;
+            loadChatList();
+        }
     </script>
 </body>
 </html>
